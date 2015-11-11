@@ -51,29 +51,11 @@
     <Reference Include="UnityEngine">
       <HintPath>Library\UnityAssemblies\UnityEngine.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.Advertisements">
-      <HintPath>Library\UnityAssemblies\UnityEngine.Advertisements.dll</HintPath>
-    </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>Library\UnityAssemblies\UnityEngine.UI.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.Networking">
       <HintPath>Library\UnityAssemblies\UnityEngine.Networking.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.Analytics">
-      <HintPath>Library\UnityAssemblies\UnityEngine.Analytics.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.Advertisements">
-      <HintPath>Library\UnityAssemblies\UnityEngine.Advertisements.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.Analytics">
-      <HintPath>Library\UnityAssemblies\UnityEngine.Analytics.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.Networking">
-      <HintPath>Library\UnityAssemblies\UnityEngine.Networking.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.UI">
-      <HintPath>Library\UnityAssemblies\UnityEngine.UI.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor">
       <HintPath>Library\UnityAssemblies\UnityEditor.dll</HintPath>
@@ -102,11 +84,16 @@
     <Compile Include="Assets\Kinect Example\KinectView\Scripts\InfraredSourceManager.cs" />
     <Compile Include="Assets\Kinect Example\KinectView\Scripts\InfraredSourceView.cs" />
     <Compile Include="Assets\Kinect Example\KinectView\Scripts\MultiSourceManager.cs" />
+    <Compile Include="Assets\common\Plugins\BodiesMessage.cs" />
+    <Compile Include="Assets\common\Plugins\BodyMessageProperties.cs" />
+    <Compile Include="Assets\common\Plugins\CommonUtils.cs" />
     <Compile Include="Assets\common\Scripts\CameraOrbit.cs" />
     <Compile Include="Assets\common\Scripts\DoNotify.cs" />
     <Compile Include="Assets\common\Scripts\GridOverlay.cs" />
+    <Compile Include="Assets\common\Scripts\Logger.cs" />
     <Compile Include="Assets\sensorclient\Scripts\RPCClient.cs" />
     <Compile Include="Assets\trackerhub\Scripts\RPCServer.cs" />
+    <Compile Include="Assets\trackerhub\Scripts\Tracker.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\common\Shaders\Grid.shader" />

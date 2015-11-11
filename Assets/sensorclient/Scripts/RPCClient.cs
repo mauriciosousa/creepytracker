@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections.Generic;
+using Kinect = Windows.Kinect;
 
 public class RPCClient : MonoBehaviour {
 
@@ -11,16 +12,33 @@ public class RPCClient : MonoBehaviour {
 
     public bool showNetworkOptions;
 
-	void Start () {
+    private string _peerName;
+    public string PeerName
+    {
+        get
+        {
+            return _peerName;
+        }
+
+        set
+        {
+            _peerName = value;
+        }
+    }
+
+    void Start () {
         showNetworkOptions = false;
+        _peerName = System.Environment.MachineName;
 	}
 	
 	void Update () {
-	
+
 	}
 
     void OnGUI()
     {
+        GUI.Label(new Rect(10, Screen.height - 25, 100, 25), PeerName);
+
         if (Network.peerType == NetworkPeerType.Disconnected)
         {
             GUI.DrawTexture(new Rect(Screen.width - 48, 1, 48, 48), offlineTex);
@@ -88,4 +106,21 @@ public class RPCClient : MonoBehaviour {
         DoNotify n = gameObject.GetComponent<DoNotify>();
         n.notifySend(NotificationLevel.INFO, "Network", "Connected to Server", 5000);
     }
+
+    public void sendNewFrame(List<Kinect.Body> listOfBodies)
+    {
+        if (Network.peerType == NetworkPeerType.Client)
+        {
+            BodiesMessage b = new BodiesMessage(PeerName, listOfBodies);
+
+#pragma warning disable CS0618 // Type or member is obsolete
+            GetComponent<NetworkView>().RPC("newFrameFromSensor", RPCMode.Server, b.Message);
+#pragma warning restore CS0618 // Type or member is obsolete
+        }
+    }
+
+    [RPC]
+    public void newFrameFromSensor(string bodies)
+    {/**/}
+
 }

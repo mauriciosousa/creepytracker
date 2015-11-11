@@ -1,4 +1,5 @@
 *.bin
-Temp\
-Library\
-bin\
+Temp/
+Library/
+bin/
+treta/

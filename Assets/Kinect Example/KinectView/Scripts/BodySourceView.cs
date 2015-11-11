@@ -6,6 +6,8 @@ using System;
 
 public class BodySourceView : MonoBehaviour 
 {
+    private int _bodies = 0;
+
     public Material BoneMaterial;
     public Material JointMaterial;
     
@@ -92,11 +94,11 @@ public class BodySourceView : MonoBehaviour
             }
         }
 
+        List<Kinect.Body> bodiesToSend = new List<Kinect.Body>();
+
         foreach(var body in data)
         {
-
             
-
             if (body == null)
             {
                 continue;
@@ -108,12 +110,38 @@ public class BodySourceView : MonoBehaviour
                 {
                     _Bodies[body.TrackingId] = CreateBodyObject(body.TrackingId);
                 }
+
                 
                 RefreshBodyObject(body, _Bodies[body.TrackingId]);
+
+                if (BodyConfidence(body) >= BodyConfidenceThreshold)
+                {
+                    bodiesToSend.Add(body);
+                }
             }
         }
+
+        RPCClient p = GameObject.Find("NetworkManager").GetComponent<RPCClient>();
+        _bodies = bodiesToSend.Count;
+        p.sendNewFrame(bodiesToSend);
+        
     }
-    
+
+    [Range(0,25)]
+    public int BodyConfidenceThreshold;
+    private int BodyConfidence(Kinect.Body body)
+    {
+        int confidence = 0;
+        
+        foreach (Kinect.Joint j in body.Joints.Values)
+        {
+            if (j.TrackingState == Windows.Kinect.TrackingState.Tracked)
+                confidence += 1;
+        }
+
+        return confidence;
+    }
+
     private GameObject CreateBodyObject(ulong id)
     {
         GameObject body = new GameObject("Body:" + id);
@@ -136,12 +164,8 @@ public class BodySourceView : MonoBehaviour
         return body;
     }
     
-    private void RefreshBodyObject(Kinect.Body newBody, GameObject bodyObject)
+    private void RefreshBodyObject(Kinect.Body body, GameObject bodyObject)
     {
-
-        Kinect.Body body = InvertBody(newBody);
-
-
         for (Kinect.JointType jt = Kinect.JointType.SpineBase; jt <= Kinect.JointType.ThumbRight; jt++)
         {
             Kinect.Joint sourceJoint = body.Joints[jt];
@@ -169,9 +193,9 @@ public class BodySourceView : MonoBehaviour
         }
     }
 
-    private Kinect.Body InvertBody(Kinect.Body body)
+    void OnGUI()
     {
-        return body;
+        GUI.Label(new Rect(10, Screen.height - 40, 150, 25), "Users: " + _bodies);
     }
 
     private static Color GetColorForState(Kinect.TrackingState state)

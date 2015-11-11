@@ -3,6 +3,8 @@ using System.Collections;
 
 public class RPCServer : MonoBehaviour {
 
+    public GameObject trackerGameObject;
+
     public string port;
 
     public Texture onlineTex;
@@ -92,5 +94,19 @@ public class RPCServer : MonoBehaviour {
 
         DoNotify n = gameObject.GetComponent<DoNotify>();
         n.notifySend(NotificationLevel.IMPORTANT, "Network", "Lost Connection", 5000);
+    }
+
+    [RPC]
+    public void newFrameFromSensor(string bodies)
+    {
+        BodiesMessage b = new BodiesMessage(bodies);
+        trackerGameObject.GetComponent<Tracker>().setNewFrame(b);
+
+        foreach (BodyBuffer buff in b.Bodiesb)
+        {
+            Debug.Log(buff.queryProperty(BodyProperties.HandRightS.ToString()));                
+        }
+        
+
     }
 }

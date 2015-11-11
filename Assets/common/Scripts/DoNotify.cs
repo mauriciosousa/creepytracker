@@ -93,18 +93,23 @@ public class DoNotify : MonoBehaviour {
 	void OnGUI()
 	{
 		int i = 10;
-		foreach (Notification n in _notifications) 
-		{
-			displayNotification(n, Screen.width / 2 - 100, i);
-			i += 40;
-		}
+        try
+        {
+            foreach (Notification n in _notifications)
+            {
+                displayNotification(n, Screen.width / 2 - 100, i);
+                i += 40;
+            }
+        }
+        catch (Exception)
+        {
+
+            // ignore
+        }
 	}
 	
 	public void notifySend(NotificationLevel level, string title, string content, int activeTimeMilliseconds)
 	{
-
-		Debug.Log (level.ToString());
-
 		Texture t = new Texture();
 		if (level == NotificationLevel.IMPORTANT) 
 		{
