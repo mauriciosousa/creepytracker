@@ -17,6 +17,8 @@ public class BodySourceView : MonoBehaviour
     private Dictionary<ulong, GameObject> _Bodies = new Dictionary<ulong, GameObject>();
     private BodySourceManager _BodyManager;
     
+    
+
     private Dictionary<Kinect.JointType, Kinect.JointType> _BoneMap = new Dictionary<Kinect.JointType, Kinect.JointType>()
     {
         { Kinect.JointType.FootLeft, Kinect.JointType.AnkleLeft },
@@ -125,6 +127,8 @@ public class BodySourceView : MonoBehaviour
         _bodies = bodiesToSend.Count;
         p.sendNewFrame(bodiesToSend);
         
+        
+
     }
 
     [Range(0,25)]

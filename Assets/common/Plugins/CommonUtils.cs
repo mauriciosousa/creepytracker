@@ -41,4 +41,19 @@ public class CommonUtils
         string[] p = v.Split(MessageSeparators.L3);
         return new Quaternion(float.Parse(p[1]), float.Parse(p[2]), float.Parse(p[2]), float.Parse(p[0]));
     }
+
+    internal static Vector3 CenterOfVectors(Vector3[] vectors)
+    {
+        Vector3 sum = Vector3.zero;
+        if (vectors == null || vectors.Length == 0)
+        {
+            return sum;
+        }
+
+        foreach (Vector3 vec in vectors)
+        {
+            sum += vec;
+        }
+        return sum / vectors.Length;
+    }
 }
