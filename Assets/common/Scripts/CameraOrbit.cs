@@ -15,14 +15,14 @@ public class CameraOrbit : MonoBehaviour {
     public float distanceMin = .5f;
     public float distanceMax = 15f;
 
-    float x = 0.0f;
-    float y = 0.0f;
+    public float x = 0.0f;
+    public float y = 0.0f;
 
     void Start()
     {
         Vector3 angles = transform.eulerAngles;
-        x = angles.y;
-        y = angles.x;
+        //x = angles.y;
+        //y = angles.x;
 
         if (GetComponent<Rigidbody>())
             GetComponent<Rigidbody>().freezeRotation = true;
