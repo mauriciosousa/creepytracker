@@ -3,7 +3,7 @@ guid: 22b96c07ef3530a469d220efe49969c5
 timeCreated: 1455647448
 licenseType: Free
 SketchUpImporter:
-  generateBackFace: 0
+  generateBackFace: 1
   mergeCoplanarFaces: 0
   selectedNodes: 00000000010000000200000003000000040000000500000006000000
   assetHash:
