@@ -130,8 +130,9 @@ public class TrackerUI : MonoBehaviour {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out hit))
             if (hit.collider != null)
+            {
                 Debug.Log(hit.transform.gameObject.name);
-
+            }
 
 
     }
