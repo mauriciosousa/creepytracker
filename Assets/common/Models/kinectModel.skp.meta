@@ -1,27 +1,27 @@
 fileFormatVersion: 2
-guid: 22b96c07ef3530a469d220efe49969c5
-timeCreated: 1455647448
+guid: d5a612a9719724642acd8b3b2aa9528d
+timeCreated: 1455648020
 licenseType: Free
 SketchUpImporter:
-  generateBackFace: 0
+  generateBackFace: 1
   mergeCoplanarFaces: 0
   selectedNodes: 00000000010000000200000003000000040000000500000006000000
   assetHash:
     serializedVersion: 2
-    Hash: 34acc8454c436dc1b7ac8ce181a1e024
+    Hash: bb7d4eed2f1de80a9a89f6963470d76c
   longitude: -105.242139
   latitude: 40.018309
   northCorrection: -0
   fileUnit: 0
   sketchUpImportData:
     defaultCamera:
-      position: {x: 11.676512, y: 0.006946599, z: 1.9067632}
-      lookAt: {x: 11.708362, y: -0.16648994, z: 0.61344117}
-      up: {x: 0.0032710799, y: 0.99113315, z: -0.13283199}
-      fov: 35
+      position: {x: 0.05128428, y: 0.25985333, z: 22.435732}
+      lookAt: {x: -0.070670195, y: 0.007053365, z: 0.034130808}
+      up: {x: -0.00006142937, y: 0.99993634, z: -0.011283852}
+      fov: 45
       aspectRatio: 0
-      orthoSize: 1
-      isPerspective: 1
+      orthoSize: 30.50708
+      isPerspective: 0
     scenes: []
   serializedVersion: 19
   fileIDToRecycleName:
