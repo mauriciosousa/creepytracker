@@ -101,12 +101,5 @@ public class RPCServer : MonoBehaviour {
     {
         BodiesMessage b = new BodiesMessage(bodies);
         trackerGameObject.GetComponent<Tracker>().setNewFrame(b);
-
-        foreach (BodyBuffer buff in b.Bodiesb)
-        {
-            Debug.Log(buff.queryProperty(BodyProperties.HandRightS.ToString()));                
-        }
-        
-
     }
 }

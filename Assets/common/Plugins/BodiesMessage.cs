@@ -12,17 +12,132 @@ public static class MessageSeparators {
     public const char SET = '=';
 }
 
+
+public enum BodyPropertiesTypes
+{
+    UID,
+    HandLeftState,
+    HandLeftConfidence,
+    HandRightState,
+    HandRightConfidence
+}
+
+public class ServerBody
+{
+    public Dictionary<BodyPropertiesTypes, string> bodyProperties;
+    public Dictionary<Kinect.JointType, Vector3> jointsPositions;
+    public string Message;
+
+    public void _start()
+    {
+        jointsPositions = new Dictionary<Windows.Kinect.JointType, Vector3>();
+        bodyProperties = new Dictionary<BodyPropertiesTypes, string>();
+    }
+
+    public ServerBody(Kinect.Body body)
+    {
+        _start();
+        Message = ""
+            + BodyPropertiesTypes.UID.ToString() + MessageSeparators.SET + body.TrackingId
+            + MessageSeparators.L2 + BodyPropertiesTypes.HandLeftState.ToString() + MessageSeparators.SET + body.HandLeftState
+            + MessageSeparators.L2 + BodyPropertiesTypes.HandLeftConfidence.ToString() + MessageSeparators.SET + body.HandLeftConfidence
+            + MessageSeparators.L2 + BodyPropertiesTypes.HandRightState.ToString() + MessageSeparators.SET + body.HandRightState
+            + MessageSeparators.L2 + BodyPropertiesTypes.HandRightConfidence.ToString() + MessageSeparators.SET + body.HandRightConfidence;
+
+        foreach (Kinect.JointType j in Enum.GetValues(typeof(Kinect.JointType)))
+        {
+            Message += "" + MessageSeparators.L2 + j.ToString() + MessageSeparators.SET + CommonUtils.convertVectorToStringRPC(body.Joints[j].Position);
+        }
+    }
+
+    public ServerBody(string body)
+    {
+        _start();
+
+        Message = body;
+        List<string> bodyAttributes = new List<string>(body.Split(MessageSeparators.L2));
+        foreach (string attr in bodyAttributes)
+        {
+            
+            string[] statement = attr.Split(MessageSeparators.SET);
+            if (statement.Length == 2)
+            {
+                if (Enum.IsDefined(typeof(BodyPropertiesTypes), statement[0]))
+                {
+                    bodyProperties[((BodyPropertiesTypes)Enum.Parse(typeof(BodyPropertiesTypes), statement[0]))] = statement[1];
+                }
+
+                if (Enum.IsDefined(typeof(Windows.Kinect.JointType), statement[0]))
+                {
+                    jointsPositions[((Windows.Kinect.JointType)Enum.Parse(typeof(Windows.Kinect.JointType), statement[0]))] = CommonUtils.convertRpcStringToVector3(statement[1]);
+                }
+            }
+        }
+    }
+}
+
+public class BodiesMessage
+{
+    public string Message { get; internal set; }
+    public string KinectId { get; internal set; }
+    
+    public List<ServerBody> _bodies;
+    public int NumberOfBodies { get { return _bodies.Count; } }
+    public List<ServerBody> Bodies { get { return _bodies;  } }
+
+    private void _start()
+    {
+        _bodies = new List<ServerBody>();
+    }
+
+    public BodiesMessage(string bodies)
+    {
+        _start();
+        Message = bodies;
+
+        List<string> pdu = new List<string>(bodies.Split(MessageSeparators.L1));
+        KinectId = pdu[0];
+        pdu.RemoveAt(0);
+
+        foreach (string b in pdu)
+        {
+            if (b != "None") _bodies.Add(new ServerBody(b));
+        }
+    }
+
+    public BodiesMessage(string kinectId, List<Kinect.Body> listOfBodies)
+    {
+        _start();
+        this.KinectId = kinectId;
+
+        Message = "" + KinectId;
+        if (listOfBodies.Count == 0) Message += "" + MessageSeparators.L1 + "None";
+        else
+        {
+            foreach (Kinect.Body b in listOfBodies)
+            {
+                ServerBody newBody = new ServerBody(b);
+                _bodies.Add(newBody);
+                Message += "" + MessageSeparators.L1 + newBody.Message;
+            }
+        }
+    }
+
+    
+}
+
+/**
 public class BodyBuffer
 {
     private Kinect.Body _originalBody;
 
-    private Dictionary<string, string> _properties;
+    private Dictionary<BodyProperties, string> _properties;
     private Dictionary<string, Vector3> _propertiesPoints;
     private Dictionary<string, Quaternion> _propertiesRotations;
 
     private void _setup()
     {
-        _properties = new Dictionary<string, string>();
+        _properties = new Dictionary<BodyProperties, string>();
         _propertiesPoints = new Dictionary<string, Vector3>();
         _propertiesRotations = new Dictionary<string, Quaternion>();
     }
@@ -33,11 +148,13 @@ public class BodyBuffer
 
         _setup();
 
-        _addProperty(BodyProperties.Uid.ToString(), body.TrackingId.ToString());
-        _addProperty(BodyProperties.HandLeftC.ToString(), body.HandLeftConfidence.ToString());
-        _addProperty(BodyProperties.HandLeftS.ToString(), body.HandLeftState.ToString());
-        _addProperty(BodyProperties.HandRightC.ToString(), body.HandRightConfidence.ToString());
-        _addProperty(BodyProperties.HandRightS.ToString(), body.HandRightState.ToString());
+        
+
+        _addProperty(BodyProperties.Uid, body.TrackingId.ToString());
+        _addProperty(BodyProperties.HandLeftC, body.HandLeftConfidence.ToString());
+        _addProperty(BodyProperties.HandLeftS, body.HandLeftState.ToString());
+        _addProperty(BodyProperties.HandRightC, body.HandRightConfidence.ToString());
+        _addProperty(BodyProperties.HandRightS, body.HandRightState.ToString());
 
         _addProperty(BodyPropertiesPoints.HeadP.ToString(), CommonUtils._convertToVector3(body.Joints[Kinect.JointType.Head].Position));
         _addProperty(BodyPropertiesPoints.NeckP.ToString(), CommonUtils._convertToVector3(body.Joints[Kinect.JointType.Neck].Position));
@@ -81,9 +198,15 @@ public class BodyBuffer
             string[] statement = attr.Split(MessageSeparators.SET);
             if (statement.Length == 2)
             {
+                
+                BodyProperties p = (BodyProperties)Enum.Parse(typeof(BodyProperties), statement[0]);
+                Debug.Log("---" + p.ToString());
+
+
+
                 if (CommonUtils.EnumContains((List<string>)Enum.GetNames(typeof(BodyProperties)).ToList(), statement[0]))
                 {
-                    _addProperty(statement[0], statement[1]);
+                   // _addProperty(statement[0], statement[1]);
                 }
                 else if (CommonUtils.EnumContains((List<string>)Enum.GetNames(typeof(BodyPropertiesPoints)).ToList(), statement[0]))
                 {
@@ -97,7 +220,7 @@ public class BodyBuffer
         }
     }
 
-    private void _addProperty(string key, string value)
+    private void _addProperty(BodyProperties key, string value)
     {
         if (!_properties.ContainsKey(key))
         {
@@ -121,7 +244,7 @@ public class BodyBuffer
         }
     }
 
-    public string queryProperty(string key)
+    public string queryProperty(BodyProperties key)
     {
         return _properties[key];
     }
@@ -138,11 +261,17 @@ public class BodyBuffer
 
 }
 
+
+
+
+
+
+
 public class BodiesMessage {
 
     private string _message;
 
-    private List<BodyBuffer> _bodiesb;
+    private List<ServerBody> _bodiesb;
 
     private string _kinectId;
 
@@ -150,17 +279,10 @@ public class BodiesMessage {
 
     public BodiesMessage(string kinectId, List<Kinect.Body> bodies)
     {
-        _message = "";
+        _bodiesb = new List<ServerBody>();
         _kinectId = kinectId;
 
-        Bodiesb = new List<BodyBuffer>();
-        foreach (Kinect.Body body in bodies)
-        {
-            Bodiesb.Add(new BodyBuffer(body));
-        }
-        _numberOfBodies = bodies.Count;
-        _composeMessage();
-        
+
     }
 
     public BodiesMessage(string bodiesMessage)
@@ -196,7 +318,7 @@ public class BodiesMessage {
             {
                 foreach (var v in Enum.GetValues(typeof(BodyProperties)))
                 {
-                    _message += v.ToString() + MessageSeparators.SET + b.queryProperty(v.ToString()) + MessageSeparators.L2;
+                    _message += v.ToString() + MessageSeparators.SET + b.queryProperty(v) + MessageSeparators.L2;
                 }
                 foreach (var v in Enum.GetValues(typeof(BodyPropertiesPoints)))
                 {
@@ -212,55 +334,6 @@ public class BodiesMessage {
         }
     }
 
-    public string KinectId
-    {
-        get
-        {
-            return _kinectId;
-        }
+   }
 
-        set
-        {
-            _kinectId = value;
-        }
-    }
-
-    public string Message
-    {
-        get
-        {
-            return _message;
-        }
-
-        set
-        {
-            _message = value;
-        }
-    }
-
-    public int NumberOfBodies
-    {
-        get
-        {
-            return _numberOfBodies;
-        }
-
-        set
-        {
-            _numberOfBodies = value;
-        }
-    }
-
-    public List<BodyBuffer> Bodiesb
-    {
-        get
-        {
-            return _bodiesb;
-        }
-
-        set
-        {
-            _bodiesb = value;
-        }
-    }
-}
+    **/

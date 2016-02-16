@@ -37,6 +37,8 @@ public class RPCClient : MonoBehaviour {
 
     void OnGUI()
     {
+        
+
         GUI.Label(new Rect(10, Screen.height - 25, 100, 25), PeerName);
 
         if (Network.peerType == NetworkPeerType.Disconnected)
@@ -112,6 +114,8 @@ public class RPCClient : MonoBehaviour {
         if (Network.peerType == NetworkPeerType.Client)
         {
             BodiesMessage b = new BodiesMessage(PeerName, listOfBodies);
+
+            Debug.Log(b.Message);
 
 #pragma warning disable CS0618 // Type or member is obsolete
             GetComponent<NetworkView>().RPC("newFrameFromSensor", RPCMode.Server, b.Message);

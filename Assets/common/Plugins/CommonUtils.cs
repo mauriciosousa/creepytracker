@@ -6,14 +6,7 @@ using Kinect = Windows.Kinect;
 
 public class CommonUtils
 {
-    internal static bool EnumContains(List<string> list, string v)
-    {
-        foreach (string s in list)
-        {
-            if (s == v) return true;
-        }
-        return false;
-    }
+    internal const int decimalsRound = 3;
 
     internal static Vector3 _convertToVector3(Kinect.CameraSpacePoint p)
     {
@@ -22,7 +15,7 @@ public class CommonUtils
 
     internal static string convertVectorToStringRPC(Vector3 v)
     {
-        return "" + v.x + MessageSeparators.L3 + v.y + MessageSeparators.L3 + v.y;
+        return "" + Math.Round(v.x, decimalsRound) + MessageSeparators.L3 + Math.Round(v.y, decimalsRound) + MessageSeparators.L3 + Math.Round(v.z, decimalsRound);
     }
 
     internal static string convertQuaternionToStringRPC(Quaternion v)
@@ -34,6 +27,11 @@ public class CommonUtils
     {
         string[] p = v.Split(MessageSeparators.L3);
         return new Vector3(float.Parse(p[0]), float.Parse(p[1]), float.Parse(p[2]));
+    }
+
+    internal static string convertVectorToStringRPC(Kinect.CameraSpacePoint position)
+    {
+        return convertVectorToStringRPC(new Vector3(position.X, position.Y, position.Z));
     }
 
     internal static Quaternion convertRpcStringToQuaternion(string v)
@@ -55,5 +53,12 @@ public class CommonUtils
             sum += vec;
         }
         return sum / vectors.Length;
+    }
+
+    internal static GameObject newGameObject(Vector3 v)
+    {
+        GameObject go = new GameObject();
+        go.transform.position = v;
+        return go;
     }
 }
