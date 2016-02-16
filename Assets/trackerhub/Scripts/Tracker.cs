@@ -224,7 +224,7 @@ public class Tracker : MonoBehaviour {
         if (!Sensors.ContainsKey(bodies.KinectId))
         {
             Debug.Log("New Sensor: bodies.KinectId");
-            Sensors[bodies.KinectId] = new Sensor(bodies.KinectId, (GameObject) Instantiate(Resources.Load("Prefabs/SensorPrefab"), new Vector3(), new Quaternion()));
+            Sensors[bodies.KinectId] = new Sensor(bodies.KinectId, (GameObject) Instantiate(Resources.Load("Prefabs/KinectSensorPrefab"), new Vector3(), new Quaternion()));
         }
         Sensors[bodies.KinectId].updateBodies(bodies);
     }
