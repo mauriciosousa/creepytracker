@@ -17,6 +17,8 @@ public class Sensor
     public BodiesMessage Bodies;
 
     private GameObject _sensorGameObject;
+    private GameObject _capsule;
+
 
     private bool _active;
 
@@ -45,7 +47,7 @@ public class Sensor
         }
     }
 
-    public Sensor(string sensorID, GameObject sensorGameObject)
+    public Sensor(string sensorID, GameObject sensorGameObject, GameObject personGO)
     {
         _active = true;
         SensorID = sensorID;
@@ -59,12 +61,27 @@ public class Sensor
         forward = new Vector3();
         right = new Vector3();
         _floorValues = new List<Vector3>();
+
+        _capsule = personGO;
+        _capsule.SetActive(false);
+        _capsule.transform.parent = _sensorGameObject.transform;
+        _capsule.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
     }
 
     internal void updateBodies(BodiesMessage bodies)
     {
         Bodies = bodies;
-        _lastUpdate = DateTime.Now;
+
+        if (Bodies.NumberOfBodies > 0)
+        {
+            _capsule.transform.localPosition = Bodies.Bodies[0].jointsPositions[Windows.Kinect.JointType.SpineBase];
+            _capsule.SetActive(true);
+        }
+        else
+        {
+            _capsule.SetActive(false);
+        }
+
     }
 
     internal void calcCenter()
@@ -163,7 +180,6 @@ public class Sensor
         _sensorGameObject.transform.localScale = new Vector3(-1, 1, 1);
 
 
-        
 
     }
 
@@ -224,7 +240,7 @@ public class Tracker : MonoBehaviour {
         if (!Sensors.ContainsKey(bodies.KinectId))
         {
             Debug.Log("New Sensor: bodies.KinectId");
-            Sensors[bodies.KinectId] = new Sensor(bodies.KinectId, (GameObject) Instantiate(Resources.Load("Prefabs/KinectSensorPrefab"), new Vector3(), new Quaternion()));
+            Sensors[bodies.KinectId] = new Sensor(bodies.KinectId, (GameObject) Instantiate(Resources.Load("Prefabs/KinectSensorPrefab"), new Vector3(), new Quaternion()), GameObject.CreatePrimitive(PrimitiveType.Capsule));
         }
         Sensors[bodies.KinectId].updateBodies(bodies);
     }
