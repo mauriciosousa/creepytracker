@@ -205,10 +205,13 @@ public class Tracker : MonoBehaviour {
         
         foreach (Sensor s in Sensors.Values)
         {
-            //foreach (ServerBody b in s.Bodies.Bodies)
+            if (s.Active)
             {
-                //Debug.Log(b.bodyProperties[BodyPropertiesTypes.HandRightState]);
-                //head = b.jointsPositions[Windows.Kinect.JointType.Head];
+                //foreach (ServerBody b in s.Bodies.Bodies)
+                {
+                    //Debug.Log(b.bodyProperties[BodyPropertiesTypes.HandRightState]);
+                    //head = b.jointsPositions[Windows.Kinect.JointType.Head];
+                }
             }
         }
 
