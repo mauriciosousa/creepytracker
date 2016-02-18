@@ -32,7 +32,7 @@ public class TrackerUI : MonoBehaviour {
     public Texture network_receiving_only;
     public Texture network_sendinging_only;
 
-    [Range(40, 100)]
+    [Range(20, 100)]
     public int iconSize;
 
     private MenuAction _menuAction;
@@ -40,7 +40,6 @@ public class TrackerUI : MonoBehaviour {
     private Tracker _userTracker;
 
     void Start () {
-        iconSize = 60;
         _userTracker = gameObject.GetComponent<Tracker>();
         _menuAction = MenuAction.None;
 
@@ -61,9 +60,13 @@ public class TrackerUI : MonoBehaviour {
         int left = 20;
 
         displayMenuButton(MenuAction.Sensors, sensorTex_on, sensorTex_off, new Rect(left, top + iconSize / 2, iconSize, iconSize));
+        GUI.Label(new Rect(left + iconSize, top + iconSize, 10, 25), "" + _userTracker.Sensors.Count);
         left += iconSize + iconSize / 2;
-        //displayMenuButton(MenuAction.Humans, humanTex_on, humanTex_off, new Rect(left, top, iconSize, iconSize));
-        //left += iconSize + iconSize / 2;
+
+        displayMenuButton(MenuAction.Humans, humanTex_on, humanTex_off, new Rect(left, top, iconSize, iconSize));
+        GUI.Label(new Rect(left + iconSize, top + iconSize, 10, 25), "" + _userTracker.Sensors.Count);
+        left += iconSize + iconSize / 2;
+        
         //displayMenuButton(MenuAction.Devices, deviceTex_on, deviceTex_off, new Rect(left, top, iconSize, iconSize));
         //left += iconSize + iconSize / 2;
         displayMenuButton(MenuAction.Settings, settingsTex_on, settingsTex_off, new Rect(left, top, iconSize, iconSize));
@@ -73,6 +76,9 @@ public class TrackerUI : MonoBehaviour {
         {
             top = 5 + 2*iconSize;
             left = 20;
+
+            GUI.Box(new Rect(left - 10, top - 10, 200, _userTracker.Sensors.Count == 0 ? 50 : 50 * _userTracker.Sensors.Count), "");
+
             if (_userTracker.Sensors.Count > 0)
             {
                 foreach (string sid in _userTracker.Sensors.Keys)
@@ -106,7 +112,7 @@ public class TrackerUI : MonoBehaviour {
                 if (GUI.Button(new Rect(left, top, 200, 35), "(1/2) Find Center"))
                 {
                     _userTracker.calibrationStatus = CalibrationProcess.FindForward;
-                    _userTracker.findCenter();
+                    _userTracker.CalibrationStep1();
                     //_menuAction = MenuAction.None;
                 }
             }
@@ -115,7 +121,7 @@ public class TrackerUI : MonoBehaviour {
                 if (GUI.Button(new Rect(left, top, 200, 35), "(2/2) Find Forward"))
                 {
                     _userTracker.calibrationStatus = CalibrationProcess.FindCenter;
-                    _userTracker.findForward();
+                    _userTracker.CalibrationStep2();
                     _menuAction = MenuAction.None;
                 }
             }

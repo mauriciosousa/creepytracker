@@ -19,17 +19,14 @@ public class Sensor
     private GameObject _sensorGameObject;
     private GameObject _capsule;
 
-
     private bool _active;
 
     private DateTime _lastUpdate;
 
-    public Vector3 center;
-    public Vector3 center2;
-    public Vector3 up;
-    public Vector3 up2;
-    public Vector3 forward;
-    public Vector3 right;
+    private Vector3 center1;
+    private Vector3 center2;
+    private Vector3 up1;
+    private Vector3 up2;
 
     private List<Vector3> _floorValues;
 
@@ -47,6 +44,14 @@ public class Sensor
         }
     }
 
+    public Vector3 CalibAuxPoint
+    {
+        get
+        {
+            return center1;
+        }
+    }
+
     public Sensor(string sensorID, GameObject sensorGameObject, GameObject personGO)
     {
         _active = true;
@@ -54,12 +59,10 @@ public class Sensor
         Bodies = null;
         _sensorGameObject = sensorGameObject;
         _sensorGameObject.name = sensorID;
-        center = new Vector3();
-        up = new Vector3();
-        up2 = new Vector3();
+        center1 = new Vector3();
         center2 = new Vector3();
-        forward = new Vector3();
-        right = new Vector3();
+        up1 = new Vector3();
+        up2 = new Vector3();
         _floorValues = new List<Vector3>();
 
         _capsule = personGO;
@@ -68,13 +71,24 @@ public class Sensor
         _capsule.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
     }
 
+    internal Vector3 pointSensorToScene(Vector3 p)
+    {
+        return _sensorGameObject.transform.localToWorldMatrix.MultiplyPoint(p);
+    }
+
+    internal Vector3 pointKinectToUnity(Vector3 p)
+    {
+        return new Vector3(-p.x, p.y, p.z);
+    }
+
     internal void updateBodies(BodiesMessage bodies)
     {
         Bodies = bodies;
 
         if (Bodies.NumberOfBodies > 0)
         {
-            _capsule.transform.localPosition = Bodies.Bodies[0].jointsPositions[Windows.Kinect.JointType.SpineBase];
+            _capsule.transform.localPosition = pointKinectToUnity(Bodies.Bodies[0].jointsPositions[Windows.Kinect.JointType.SpineShoulder]);
+
             _capsule.SetActive(true);
         }
         else
@@ -84,117 +98,58 @@ public class Sensor
 
     }
 
-    internal void calcCenter()
+    internal void calibrationStep1()
     {
-        center = Bodies.Bodies[0].jointsPositions[Windows.Kinect.JointType.Head];
+        center1 = pointKinectToUnity(Bodies.Bodies[0].jointsPositions[Windows.Kinect.JointType.SpineShoulder]);
+        up1 = pointKinectToUnity(Bodies.Bodies[0].jointsPositions[Windows.Kinect.JointType.SpineShoulder]) - pointKinectToUnity(Bodies.Bodies[0].jointsPositions[Windows.Kinect.JointType.SpineBase]);
+
+        _floorValues.Add(pointKinectToUnity(Bodies.Bodies[0].jointsPositions[Windows.Kinect.JointType.FootLeft]));
+        _floorValues.Add(pointKinectToUnity(Bodies.Bodies[0].jointsPositions[Windows.Kinect.JointType.FootRight]));
     }
 
-    internal void calcUp()
+    internal void calibrationStep2()
     {
-        up = Bodies.Bodies[0].jointsPositions[Windows.Kinect.JointType.SpineShoulder] - Bodies.Bodies[0].jointsPositions[Windows.Kinect.JointType.SpineBase];
-        //_floorValues.Add(Bodies.Bodies[0].jointsPositions[Windows.Kinect.JointType.FootLeft]);
-        //_floorValues.Add(Bodies.Bodies[0].jointsPositions[Windows.Kinect.JointType.FootRight]);
+        center2 = pointKinectToUnity(Bodies.Bodies[0].jointsPositions[Windows.Kinect.JointType.SpineShoulder]);
+        up2 = pointKinectToUnity(Bodies.Bodies[0].jointsPositions[Windows.Kinect.JointType.SpineShoulder]) - pointKinectToUnity(Bodies.Bodies[0].jointsPositions[Windows.Kinect.JointType.SpineBase]);
 
-        _floorValues.Add(Bodies.Bodies[0].jointsPositions[Windows.Kinect.JointType.FootLeft]);
-        _floorValues.Add(Bodies.Bodies[0].jointsPositions[Windows.Kinect.JointType.FootRight]);
+        _floorValues.Add(pointKinectToUnity(Bodies.Bodies[0].jointsPositions[Windows.Kinect.JointType.FootLeft]));
+        _floorValues.Add(pointKinectToUnity(Bodies.Bodies[0].jointsPositions[Windows.Kinect.JointType.FootRight]));
 
-    }
+        // Begin calibration calculations
 
-    internal void calcCenter2()
-    {
-        center2 = Bodies.Bodies[0].jointsPositions[Windows.Kinect.JointType.Head];
-        forward = center2 - center;
-        up2 = Bodies.Bodies[0].jointsPositions[Windows.Kinect.JointType.SpineShoulder] - Bodies.Bodies[0].jointsPositions[Windows.Kinect.JointType.SpineBase];
+        Vector3 up = (up1 + up2) / 2.0f;
+        Vector3 forward = center2 - center1;
 
-        Debug.Log("center: " + center);
-        Debug.Log("center2: " + center2);
-        Debug.Log("forward: " + forward);
-        Debug.Log("up: " + up);
-        Debug.Log("up2: " + up2);
+        GameObject centerGO = new GameObject();
+        centerGO.transform.parent = _sensorGameObject.transform;
+        centerGO.transform.rotation = Quaternion.LookRotation(forward, up);
+        centerGO.transform.position = center1;
 
-        _floorValues.Add(Bodies.Bodies[0].jointsPositions[Windows.Kinect.JointType.FootLeft]);
-        _floorValues.Add(Bodies.Bodies[0].jointsPositions[Windows.Kinect.JointType.FootRight]);
+        centerGO.transform.parent = null;
+        _sensorGameObject.transform.parent = centerGO.transform;
+        centerGO.transform.position = Vector3.zero;
+        centerGO.transform.rotation = Quaternion.identity;
 
-    }
-
-    internal void applyCalibration()
-    {
-        up.Normalize();
-        up2.Normalize();
-        up = (up + up2) / 2.0f;
-
-        up = new Vector3(-up.x, up.y, up.z);
-
-        forward.Normalize();
-
-        forward = new Vector3(-forward.x, forward.y, forward.z);
-
-        right = Vector3.Cross(forward, up);
-        forward = Vector3.Cross(right, up);
-
-        Matrix4x4 m = new Matrix4x4();
-
-        m[0, 0] = right.x;
-        m[1, 0] = right.y;
-        m[2, 0] = right.z;
-        m[3, 0] = 0;
-
-        m[0, 1] = up.x;
-        m[1, 1] = up.y;
-        m[2, 1] = up.z;
-        m[3, 1] = 0;
-
-        m[0, 2] = forward.x;
-        m[1, 2] = forward.y;
-        m[2, 2] = forward.z;
-        m[3, 2] = 0;
-
-        m[0, 3] = center.x;
-        m[1, 3] = center.y;
-        m[2, 3] = center.z;
-        m[3, 3] = 1;
-
-        m = m.inverse;
-
-
-
+        _sensorGameObject.transform.parent = null;
+        GameObject.Destroy(centerGO);
 
         Vector3 minv = new Vector3();
-        float min = 100000;
+        float min = float.PositiveInfinity;
 
         foreach (Vector3 v in _floorValues)
         {
-            Vector3 tmp = m.MultiplyPoint(v);
+            Vector3 tmp = pointSensorToScene(v);
 
             if (tmp.y < min)
                 minv = tmp;
         }
 
-        /*GameObject minGO = CommonUtils.newGameObject(minv);
-        minGO.transform.parent = _sensorGameObject.transform;
-        minGO.name = "Floor";*/
-
-
-        _sensorGameObject.transform.position = new Vector3(m[0, 3], m[1, 3] - minv.y, m[2, 3]);
-        _sensorGameObject.transform.rotation = MatrixToRotation(m);
-        _sensorGameObject.transform.localScale = new Vector3(-1, 1, 1);
-
-
-
+        move(new Vector3(0, -minv.y, 0));
     }
 
-    private static Quaternion MatrixToRotation(Matrix4x4 m)
+    internal void move(Vector3 positiondelta)
     {
-        // Adapted from: http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm
-        Quaternion q = new Quaternion();
-        q.w = Mathf.Sqrt(Mathf.Max(0, 1 + m[0, 0] + m[1, 1] + m[2, 2])) / 2;
-        q.x = Mathf.Sqrt(Mathf.Max(0, 1 + m[0, 0] - m[1, 1] - m[2, 2])) / 2;
-        q.y = Mathf.Sqrt(Mathf.Max(0, 1 - m[0, 0] + m[1, 1] - m[2, 2])) / 2;
-        q.z = Mathf.Sqrt(Mathf.Max(0, 1 - m[0, 0] - m[1, 1] + m[2, 2])) / 2;
-        q.x *= Mathf.Sign(q.x * (m[2, 1] - m[1, 2]));
-        q.y *= Mathf.Sign(q.y * (m[0, 2] - m[2, 0]));
-        q.z *= Mathf.Sign(q.z * (m[1, 0] - m[0, 1]));
-        return q;
+        _sensorGameObject.transform.position += positiondelta;
     }
 }
 
@@ -223,50 +178,57 @@ public class Tracker : MonoBehaviour {
         {
             if (s.Active)
             {
-                //foreach (ServerBody b in s.Bodies.Bodies)
-                {
-                    //Debug.Log(b.bodyProperties[BodyPropertiesTypes.HandRightState]);
-                    //head = b.jointsPositions[Windows.Kinect.JointType.Head];
-                }
+                
             }
         }
-
-
-
 	}
 
     internal void setNewFrame(BodiesMessage bodies)
     {
         if (!Sensors.ContainsKey(bodies.KinectId))
         {
-            Debug.Log("New Sensor: bodies.KinectId");
-            Sensors[bodies.KinectId] = new Sensor(bodies.KinectId, (GameObject) Instantiate(Resources.Load("Prefabs/KinectSensorPrefab"), new Vector3(), new Quaternion()), GameObject.CreatePrimitive(PrimitiveType.Capsule));
+            Debug.Log("New Sensor: " + bodies.KinectId);
+            Sensors[bodies.KinectId] = new Sensor(bodies.KinectId, (GameObject) Instantiate(Resources.Load("Prefabs/KinectSensorPrefab"), new Vector3(), new Quaternion()), GameObject.CreatePrimitive(PrimitiveType.Sphere));
         }
         Sensors[bodies.KinectId].updateBodies(bodies);
     }
 
-    internal void findCenter()
+    internal void CalibrationStep1()
     {
         foreach (Sensor sensor in _sensors.Values)
         {
             if (sensor.Bodies.Bodies.Count == 1 && sensor.Active)
             {
-                sensor.calcCenter();
-                sensor.calcUp();
+                sensor.calibrationStep1();
             }
         }
     }
 
-    internal void findForward()
+    internal void CalibrationStep2()
     {
+
+        Vector3 avgCenter = new Vector3();
+        int sensorCount = 0;
+
         foreach (Sensor sensor in _sensors.Values)
         {
             if (sensor.Bodies.Bodies.Count == 1 && sensor.Active)
             {
-                sensor.calcCenter2();
-                sensor.applyCalibration();
+                sensor.calibrationStep2();
+
+                avgCenter += sensor.pointSensorToScene(sensor.CalibAuxPoint);
+                sensorCount += 1;
             }
         }
 
+        avgCenter /= sensorCount;
+
+        foreach (Sensor sensor in _sensors.Values)
+        {
+            if (sensor.Bodies.Bodies.Count == 1 && sensor.Active)
+            {
+                sensor.move(avgCenter - sensor.pointSensorToScene(sensor.CalibAuxPoint));   
+            }
+        }
     }
 }
