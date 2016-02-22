@@ -39,19 +39,14 @@ public class TrackerUI : MonoBehaviour {
 
     private Tracker _userTracker;
 
-    void Start () {
+    void Start()
+    {
         _userTracker = gameObject.GetComponent<Tracker>();
         _menuAction = MenuAction.None;
-
-
-
     }
-	
 	
 	void Update () {
         
-
-        // clean sensors & clean bodies
 	}
 
     void OnGUI()
@@ -113,7 +108,6 @@ public class TrackerUI : MonoBehaviour {
                 {
                     _userTracker.calibrationStatus = CalibrationProcess.FindForward;
                     _userTracker.CalibrationStep1();
-                    //_menuAction = MenuAction.None;
                 }
             }
             else if (_userTracker.calibrationStatus == CalibrationProcess.FindForward)
@@ -132,13 +126,13 @@ public class TrackerUI : MonoBehaviour {
 
 
 
-        RaycastHit hit;
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out hit))
-            if (hit.collider != null)
-            {
-                Debug.Log(hit.transform.gameObject.name);
-            }
+        //RaycastHit hit;
+        //Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        //if (Physics.Raycast(ray, out hit))
+        //    if (hit.collider != null)
+        //    {
+        //        Debug.Log(hit.transform.gameObject.name);
+        //    }
 
 
     }

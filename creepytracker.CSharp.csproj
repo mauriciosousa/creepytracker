@@ -87,6 +87,7 @@
     <Compile Include="Assets\common\Scripts\Logger.cs" />
     <Compile Include="Assets\sensorclient\Plugins\SimpleCalibData.cs" />
     <Compile Include="Assets\sensorclient\Scripts\RPCClient.cs" />
+    <Compile Include="Assets\trackerhub\Scripts\HumanSkeleton.cs" />
     <Compile Include="Assets\trackerhub\Scripts\RPCServer.cs" />
     <Compile Include="Assets\trackerhub\Scripts\Tracker.cs" />
     <Compile Include="Assets\trackerhub\Scripts\TrackerUI.cs" />

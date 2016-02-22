@@ -116,10 +116,10 @@ public class BodySourceView : MonoBehaviour
                 
                 RefreshBodyObject(body, _Bodies[body.TrackingId]);
 
-                if (BodyConfidence(body) >= BodyConfidenceThreshold)
-                {
+                //if (BodyConfidence(body) >= BodyConfidenceThreshold)
+                //{
                     bodiesToSend.Add(body);
-                }
+                //}
             }
         }
 
@@ -131,20 +131,9 @@ public class BodySourceView : MonoBehaviour
 
     }
 
-    [Range(0,25)]
-    public int BodyConfidenceThreshold;
-    private int BodyConfidence(Kinect.Body body)
-    {
-        int confidence = 0;
-        
-        foreach (Kinect.Joint j in body.Joints.Values)
-        {
-            if (j.TrackingState == Windows.Kinect.TrackingState.Tracked)
-                confidence += 1;
-        }
-
-        return confidence;
-    }
+    //[Range(0,25)]
+    //public int BodyConfidenceThreshold;
+    
 
     private GameObject CreateBodyObject(ulong id)
     {

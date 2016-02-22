@@ -62,7 +62,7 @@ public class RPCServer : MonoBehaviour {
 
                 if (GUI.Button(new Rect(Screen.width - 90, top, 90, 25), "Start"))
                 {
-                    Network.InitializeServer(32, int.Parse(port), true);
+                    Network.InitializeServer(32, int.Parse(port), false);
                     showNetworkOptions = false;
                 }
 

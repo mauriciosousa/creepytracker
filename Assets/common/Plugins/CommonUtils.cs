@@ -61,4 +61,16 @@ public class CommonUtils
         go.transform.position = v;
         return go;
     }
+
+    private static int userIDs = 0;
+    public static int getNewID()
+    {
+        return ++userIDs;
+    }
+
+    internal static Vector3 pointKinectToUnity(Vector3 p)
+    {
+        return new Vector3(-p.x, p.y, p.z);
+    }
+
 }
