@@ -81,6 +81,10 @@
     <Compile Include="Assets\Kinect Example\KinectView\Scripts\MultiSourceManager.cs" />
     <Compile Include="Assets\common\Plugins\BodiesMessage.cs" />
     <Compile Include="Assets\common\Plugins\CommonUtils.cs" />
+    <Compile Include="Assets\common\Plugins\ConfigProperties.cs" />
+    <Compile Include="Assets\common\Plugins\KalmanFilterFloat.cs" />
+    <Compile Include="Assets\common\Plugins\KalmanFilterVector3.cs" />
+    <Compile Include="Assets\common\Plugins\UdpBroadcast.cs" />
     <Compile Include="Assets\common\Scripts\CameraOrbit.cs" />
     <Compile Include="Assets\common\Scripts\DoNotify.cs" />
     <Compile Include="Assets\common\Scripts\GridOverlay.cs" />
@@ -90,11 +94,13 @@
     <Compile Include="Assets\trackerhub\Scripts\HumanSkeleton.cs" />
     <Compile Include="Assets\trackerhub\Scripts\RPCServer.cs" />
     <Compile Include="Assets\trackerhub\Scripts\Tracker.cs" />
+    <Compile Include="Assets\trackerhub\Scripts\TrackerProperties.cs" />
     <Compile Include="Assets\trackerhub\Scripts\TrackerUI.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\common\Models\Shaders\Skybox-Procedural.shader" />
     <None Include="Assets\common\Shaders\Grid.shader" />
+    <None Include="Assets\configSettings.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2015\UnityVS.CSharp.targets" />
 </Project>

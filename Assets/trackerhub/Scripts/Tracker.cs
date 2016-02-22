@@ -20,6 +20,7 @@ public class Sensor
     public Dictionary<string, SensorBody> bodies;
 
     private GameObject _sensorGameObject;
+    public GameObject SensorGameObject { get { return _sensorGameObject; } }
 
     private bool _active;
 
@@ -61,7 +62,7 @@ public class Sensor
         SensorID = sensorID;
         lastBodiesMessage = null;
         _sensorGameObject = sensorGameObject;
-        _sensorGameObject.name = sensorID;
+        SensorGameObject.name = sensorID;
         center1 = new Vector3();
         center2 = new Vector3();
         up1 = new Vector3();
@@ -71,12 +72,14 @@ public class Sensor
 
     internal Vector3 pointSensorToScene(Vector3 p)
     {
-        return _sensorGameObject.transform.localToWorldMatrix.MultiplyPoint(p);
+        return SensorGameObject.transform.localToWorldMatrix.MultiplyPoint(p);
     }
 
     internal void updateBodies()
     {
         BodiesMessage bodiesMessage = lastBodiesMessage;
+
+        if (bodiesMessage == null) return;
 
         foreach (KeyValuePair<string, SensorBody> sb in bodies)
         {
@@ -88,7 +91,7 @@ public class Sensor
         {
             SensorBody b;
 
-            if (int.Parse(sk.bodyProperties[BodyPropertiesTypes.Confidence]) < 20)
+            if (int.Parse(sk.bodyProperties[BodyPropertiesTypes.Confidence]) < TrackerProperties.Instance.confidenceTreshold)
             {
                 if (bodies.ContainsKey(sk.ID))
                 {
@@ -105,7 +108,7 @@ public class Sensor
             }
             else
             {   // new bodies
-                b = new SensorBody(sk.ID, _sensorGameObject.transform);
+                b = new SensorBody(sk.ID, SensorGameObject.transform);
                 bodies[sk.ID] = b;
                 b.sensorID = SensorID;
             }
@@ -134,8 +137,8 @@ public class Sensor
 
     internal void calibrationStep1()
     {
-        center1 = CommonUtils.pointKinectToUnity(lastBodiesMessage.Bodies[0].jointsPositions[Windows.Kinect.JointType.SpineShoulder]);
-        up1 = CommonUtils.pointKinectToUnity(lastBodiesMessage.Bodies[0].jointsPositions[Windows.Kinect.JointType.SpineShoulder]) - CommonUtils.pointKinectToUnity(lastBodiesMessage.Bodies[0].jointsPositions[Windows.Kinect.JointType.SpineBase]);
+        center1 = CommonUtils.pointKinectToUnity(lastBodiesMessage.Bodies[0].jointsPositions[TrackerProperties.Instance.centerJoint]);
+        up1 = CommonUtils.pointKinectToUnity(lastBodiesMessage.Bodies[0].jointsPositions[TrackerProperties.Instance.upJointB]) - CommonUtils.pointKinectToUnity(lastBodiesMessage.Bodies[0].jointsPositions[TrackerProperties.Instance.upJointA]);
 
         _floorValues.Add(CommonUtils.pointKinectToUnity(lastBodiesMessage.Bodies[0].jointsPositions[Windows.Kinect.JointType.FootLeft]));
         _floorValues.Add(CommonUtils.pointKinectToUnity(lastBodiesMessage.Bodies[0].jointsPositions[Windows.Kinect.JointType.FootRight]));
@@ -143,8 +146,8 @@ public class Sensor
 
     internal void calibrationStep2()
     {
-        center2 = CommonUtils.pointKinectToUnity(lastBodiesMessage.Bodies[0].jointsPositions[Windows.Kinect.JointType.SpineShoulder]);
-        up2 = CommonUtils.pointKinectToUnity(lastBodiesMessage.Bodies[0].jointsPositions[Windows.Kinect.JointType.SpineShoulder]) - CommonUtils.pointKinectToUnity(lastBodiesMessage.Bodies[0].jointsPositions[Windows.Kinect.JointType.SpineBase]);
+        center2 = CommonUtils.pointKinectToUnity(lastBodiesMessage.Bodies[0].jointsPositions[TrackerProperties.Instance.centerJoint]);
+        up2 = CommonUtils.pointKinectToUnity(lastBodiesMessage.Bodies[0].jointsPositions[TrackerProperties.Instance.upJointB]) - CommonUtils.pointKinectToUnity(lastBodiesMessage.Bodies[0].jointsPositions[TrackerProperties.Instance.upJointA]);
 
         _floorValues.Add(CommonUtils.pointKinectToUnity(lastBodiesMessage.Bodies[0].jointsPositions[Windows.Kinect.JointType.FootLeft]));
         _floorValues.Add(CommonUtils.pointKinectToUnity(lastBodiesMessage.Bodies[0].jointsPositions[Windows.Kinect.JointType.FootRight]));
@@ -153,18 +156,23 @@ public class Sensor
 
         Vector3 up = (up1 + up2) / 2.0f;
         Vector3 forward = center2 - center1;
+        Vector3 right = Vector3.Cross(up, forward);
+        forward = Vector3.Cross(right, up);
+
+        SensorGameObject.transform.position = Vector3.zero;
+        SensorGameObject.transform.rotation = Quaternion.identity;
 
         GameObject centerGO = new GameObject();
-        centerGO.transform.parent = _sensorGameObject.transform;
+        centerGO.transform.parent = SensorGameObject.transform;
         centerGO.transform.rotation = Quaternion.LookRotation(forward, up);
         centerGO.transform.position = center1;
 
         centerGO.transform.parent = null;
-        _sensorGameObject.transform.parent = centerGO.transform;
+        SensorGameObject.transform.parent = centerGO.transform;
         centerGO.transform.position = Vector3.zero;
         centerGO.transform.rotation = Quaternion.identity;
 
-        _sensorGameObject.transform.parent = null;
+        SensorGameObject.transform.parent = null;
         GameObject.Destroy(centerGO);
 
         Vector3 minv = new Vector3();
@@ -183,7 +191,7 @@ public class Sensor
 
     internal void move(Vector3 positiondelta)
     {
-        _sensorGameObject.transform.position += positiondelta;
+        SensorGameObject.transform.position += positiondelta;
     }
 }
 
@@ -231,6 +239,7 @@ public class Human
     public GameObject gameObject;
     public DateTime timeOfDeath;
     public string seenBySensor;
+    private HumanSkeleton skeleton;
 
     private Vector3 position;
     public Vector3 Position
@@ -254,17 +263,19 @@ public class Human
         this.gameObject = gameObject;
         this.gameObject.name = "Human " + ID;
 
-        HumanSkeleton hsk = this.gameObject.GetComponent<HumanSkeleton>();
-        hsk.tracker = tracker;
-        hsk.ID = ID;
-        hsk.updateSkeleton();
+        skeleton = this.gameObject.GetComponent<HumanSkeleton>();
+        skeleton.tracker = tracker;
+        skeleton.ID = ID;
+        skeleton.updateSkeleton();
+    }
+
+    internal string getPDU()
+    {
+        return skeleton.getPDU();
     }
 }
 
 public class Tracker : MonoBehaviour {
-
-    [Range(0, 1)]
-    public float mergeDistance = 0.3f;
 
     private Dictionary<string, Sensor> _sensors;
     public Dictionary<string, Sensor> Sensors
@@ -275,12 +286,26 @@ public class Tracker : MonoBehaviour {
         }
     }
 
+    private CalibrationProcess _calibrationStatus;
+    public CalibrationProcess CalibrationStatus
+    {
+        get
+        {
+            return _calibrationStatus;
+        }
+
+        set
+        {
+            _calibrationStatus = value;
+        }
+    }
+
     private Dictionary<int, Human> _humans;
 
     private List<Human> _deadHumans;
     private List<Human> _humansToKill;
 
-    public CalibrationProcess calibrationStatus;
+    private UdpBroadcast _udpBroadcast;
 
     void Start ()
     {
@@ -288,10 +313,16 @@ public class Tracker : MonoBehaviour {
         _humans = new Dictionary<int, Human>();
         _deadHumans = new List<Human>();
         _humansToKill = new List<Human>();
-        calibrationStatus = CalibrationProcess.FindCenter;
+        _calibrationStatus = CalibrationProcess.FindCenter;
+
+        _udpBroadcast = new UdpBroadcast(TrackerProperties.Instance.broadcastPort);
+
+        _loadConfig();
+        _loadSavedSensors();
+        
     }
-	
-	void Update ()
+
+    void Update ()
     {
         foreach(Sensor s in _sensors.Values)
         {
@@ -318,6 +349,22 @@ public class Tracker : MonoBehaviour {
             Destroy(h.gameObject);
         }
         _humansToKill.Clear();
+
+        // udp broadcast
+
+        string strToSend = "" + _humans.Count;
+
+        foreach (Human h in _humans.Values)
+        {
+            try
+            {
+                strToSend += MessageSeparators.L1 + h.getPDU();
+            }
+            catch (Exception e)
+            { }
+        }
+
+        _udpBroadcast.send(strToSend);
     }
 
     private void mergeHumans()
@@ -365,7 +412,7 @@ public class Tracker : MonoBehaviour {
 
             foreach (SensorBody b in h.Value.bodies)
             {
-                if (b.updated)
+                if (b.updated && Sensors[b.sensorID].Active)
                     position = (position * (float)numberOfBodies++ + b.WorldPosition) / (float)numberOfBodies;
                 else
                     deadBodies.Add(b);
@@ -399,7 +446,7 @@ public class Tracker : MonoBehaviour {
             // try to fit in existing humans
             foreach (KeyValuePair<int, Human> h in _humans)
             {
-                if (Vector3.Distance(b.WorldPosition, h.Value.Position) < mergeDistance)
+                if (Vector3.Distance(b.WorldPosition, h.Value.Position) < TrackerProperties.Instance.mergeDistance)
                 {
                     h.Value.Position = (h.Value.Position * (float)h.Value.bodies.Count + b.WorldPosition) / (float)(h.Value.bodies.Count + 1);
                     h.Value.bodies.Add(b);
@@ -413,7 +460,7 @@ public class Tracker : MonoBehaviour {
                 // try to fit in dead humans
                 foreach (Human h in _deadHumans)
                 {
-                    if (Vector3.Distance(b.WorldPosition, h.Position) < mergeDistance)
+                    if (Vector3.Distance(b.WorldPosition, h.Position) < TrackerProperties.Instance.mergeDistance)
                     {
                         h.Position = (h.Position * (float)h.bodies.Count + b.WorldPosition) / (float)(h.bodies.Count + 1);
                         h.bodies.Add(b);
@@ -458,7 +505,7 @@ public class Tracker : MonoBehaviour {
             {
                 if (h1.Value.ID != h2.Value.ID && !mergedHumans.Contains(h2.Value))
                 {
-                    if (Vector3.Distance(h1.Value.Position, h2.Value.Position) < mergeDistance)
+                    if (Vector3.Distance(h1.Value.Position, h2.Value.Position) < TrackerProperties.Instance.mergeDistance)
                     {
                         Vector3 position = (h1.Value.Position * (float)h1.Value.bodies.Count + h2.Value.Position * (float)h2.Value.bodies.Count) / (float)(h1.Value.bodies.Count + h2.Value.bodies.Count);
 
@@ -502,15 +549,25 @@ public class Tracker : MonoBehaviour {
         Sensors[bodies.KinectId].lastBodiesMessage = bodies;
     }
 
-    internal void CalibrationStep1()
+    internal bool CalibrationStep1()
     {
+        bool cannotCalibrate = false;
         foreach (Sensor sensor in _sensors.Values)
         {
-            if (sensor.lastBodiesMessage.Bodies.Count == 1 && sensor.Active)
+            if (sensor.lastBodiesMessage != null && sensor.lastBodiesMessage.Bodies.Count == 1 && sensor.Active)
             {
                 sensor.calibrationStep1();
             }
+            else cannotCalibrate = true;
         }
+
+        if (cannotCalibrate)
+        {
+            DoNotify n = GameObject.Find("NetworkManager").GetComponent<DoNotify>();
+            n.notifySend(NotificationLevel.IMPORTANT, "Calibration error", "Incorrect user placement!", 5000);
+        }
+
+        return !cannotCalibrate;
     }
 
     internal void CalibrationStep2()
@@ -521,7 +578,7 @@ public class Tracker : MonoBehaviour {
 
         foreach (Sensor sensor in _sensors.Values)
         {
-            if (sensor.lastBodiesMessage.Bodies.Count == 1 && sensor.Active)
+            if (sensor.lastBodiesMessage != null && sensor.lastBodiesMessage.Bodies.Count == 1 && sensor.Active)
             {
                 sensor.calibrationStep2();
 
@@ -539,6 +596,11 @@ public class Tracker : MonoBehaviour {
                 sensor.move(avgCenter - sensor.pointSensorToScene(sensor.CalibAuxPoint));   
             }
         }
+
+        _saveConfig();
+
+        DoNotify n = GameObject.Find("NetworkManager").GetComponent<DoNotify>();
+        n.notifySend(NotificationLevel.INFO, "Calibration complete", "Config file updated", 5000);
     }
 
     internal Vector3 getJointPosition(int id, JointType joint)
@@ -575,5 +637,60 @@ public class Tracker : MonoBehaviour {
         {
             GUI.Label(new Rect(10, Screen.height - (n++ * 50), 1000, 50), "Human " + h.ID + " as seen by " + h.seenBySensor);
         }
+    }
+
+    private void _saveConfig()
+    {
+        string filePath = Application.dataPath + "/" + TrackerProperties.Instance.configFilename;
+        ConfigProperties.clear(filePath);
+
+        // save properties
+
+
+        // save sensors
+        foreach (Sensor s in _sensors.Values)
+        {
+            if (s.Active)
+            {
+                Vector3 p = s.SensorGameObject.transform.position;
+                Quaternion r = s.SensorGameObject.transform.rotation;
+                ConfigProperties.save(filePath, "kinect." + s.SensorID, "" + s.SensorID + ";" + p.x + ";" + p.y + ";" + p.z + ";" + r.x + ";" + r.y + ";" + r.z + ";" + r.w);
+            }
+        }
+    }
+
+    private void _loadConfig()
+    {
+        string filePath = Application.dataPath + "/" + TrackerProperties.Instance.configFilename;
+
+        //Debug.Log(ConfigProperties.load(filePath, "exampleValue"));
+    }
+
+    private void _loadSavedSensors()
+    {
+        foreach (String line in ConfigProperties.loadKinects(Application.dataPath + "/" + TrackerProperties.Instance.configFilename))
+        {
+            string[] values = line.Split(';');
+
+            string id = values[0];
+
+            Vector3 position = new Vector3(
+                float.Parse(values[1].Replace(',', '.')),
+                float.Parse(values[2].Replace(',', '.')),
+                float.Parse(values[3].Replace(',', '.')));
+
+            Quaternion rotation = new Quaternion(
+                float.Parse(values[4].Replace(',', '.')),
+                float.Parse(values[5].Replace(',', '.')),
+                float.Parse(values[6].Replace(',', '.')),
+                float.Parse(values[7].Replace(',', '.')));
+
+            Sensors[id] = new Sensor(id, (GameObject)Instantiate(Resources.Load("Prefabs/KinectSensorPrefab"), position, rotation));
+        }
+    }
+
+    internal void resetBroadcast()
+    {
+        _udpBroadcast.reset(TrackerProperties.Instance.broadcastPort);
     }
 }

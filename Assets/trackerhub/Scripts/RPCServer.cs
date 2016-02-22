@@ -6,6 +6,7 @@ public class RPCServer : MonoBehaviour {
     public GameObject trackerGameObject;
 
     public string port;
+    public string broadcastPort;
 
     public Texture onlineTex;
     public Texture offlineTex;
@@ -15,6 +16,11 @@ public class RPCServer : MonoBehaviour {
     void Start()
     {
         showNetworkOptions = false;
+
+        port = "" + TrackerProperties.Instance.rpcPort;
+        broadcastPort = "" + TrackerProperties.Instance.broadcastPort;
+
+        Network.InitializeServer(32, int.Parse(port), false);
     }
 
     void Update()
@@ -49,18 +55,24 @@ public class RPCServer : MonoBehaviour {
 
         if (showNetworkOptions)
         {
-            int left = Screen.width - 200;
+
+            int left = Screen.width - 270;
             int top = 50;
+
+            GUI.Box(new Rect(left, top, 260, 80), "");
+
 
             if (Network.peerType == NetworkPeerType.Disconnected)
             {
+                left += 20;
+                top += 10;
+                GUI.Label(new Rect(left, top, 100, 25), "Sensors port:");
 
-                GUI.Label(new Rect(left, top, 100, 25), "port:");
-                port = GUI.TextField(new Rect(left + 60, top, 50, 25), port);
+                left += 100 + 10;
+                port = GUI.TextField(new Rect(left, top, 50, 25), port);
 
-                top += 30;
-
-                if (GUI.Button(new Rect(Screen.width - 90, top, 90, 25), "Start"))
+                left += 50 + 10;
+                if (GUI.Button(new Rect(left, top, 50, 25), "Start"))
                 {
                     Network.InitializeServer(32, int.Parse(port), false);
                     showNetworkOptions = false;
@@ -71,12 +83,31 @@ public class RPCServer : MonoBehaviour {
             {
                 if (Network.peerType == NetworkPeerType.Server)
                 {
-                    GUI.Label(new Rect(Screen.width - 48 - 58, 10, 100, 25), "I'm a server");
-                    if (GUI.Button(new Rect(Screen.width - 120, 155, 90, 25), "Stop"))
+                    
+                    top += 10;
+                    GUI.Label(new Rect(left + 20, top, 150, 25), "I'm a server on: " + port);
+                    if (GUI.Button(new Rect(left + 190, top, 50, 25), "Stop"))
                     {
                         Network.Disconnect(250);
                     }
                 }
+            }
+
+            top += 35;
+            left = Screen.width - 270;
+
+            left += 20;
+            GUI.Label(new Rect(left, top, 100, 25), "Broadcast port:");
+
+            left += 100 + 10;
+            broadcastPort = GUI.TextField(new Rect(left, top, 50, 25), broadcastPort);
+
+            left += 50 + 10;
+            if (GUI.Button(new Rect(left, top, 50, 25), "Reset"))
+            {
+                TrackerProperties.Instance.broadcastPort = int.Parse(broadcastPort);
+                trackerGameObject.GetComponent<Tracker>().resetBroadcast();
+                showNetworkOptions = false;
             }
         }
     }

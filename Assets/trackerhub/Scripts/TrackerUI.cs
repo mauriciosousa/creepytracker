@@ -43,6 +43,8 @@ public class TrackerUI : MonoBehaviour {
     {
         _userTracker = gameObject.GetComponent<Tracker>();
         _menuAction = MenuAction.None;
+
+        
     }
 	
 	void Update () {
@@ -55,10 +57,6 @@ public class TrackerUI : MonoBehaviour {
         int left = 20;
 
         displayMenuButton(MenuAction.Sensors, sensorTex_on, sensorTex_off, new Rect(left, top + iconSize / 2, iconSize, iconSize));
-        GUI.Label(new Rect(left + iconSize, top + iconSize, 10, 25), "" + _userTracker.Sensors.Count);
-        left += iconSize + iconSize / 2;
-
-        displayMenuButton(MenuAction.Humans, humanTex_on, humanTex_off, new Rect(left, top, iconSize, iconSize));
         GUI.Label(new Rect(left + iconSize, top + iconSize, 10, 25), "" + _userTracker.Sensors.Count);
         left += iconSize + iconSize / 2;
         
@@ -96,25 +94,30 @@ public class TrackerUI : MonoBehaviour {
         if (_menuAction == MenuAction.Settings)
         {
             top = 5 + 2 * iconSize;
-            left = iconSize + 20;
+            left = iconSize + 50;
 
+            GUI.Box(new Rect(left, top - 10, 200, 100), "");
+            left += 10;
 
-            GUI.Label(new Rect(left, top, 500, 35), "Calibration");
-            top += 50;
+            GUI.Label(new Rect(left, top, 500, 35), "Calibration: ");
+            top += 40;
 
-            if (_userTracker.calibrationStatus == CalibrationProcess.FindCenter)
+            if (_userTracker.CalibrationStatus == CalibrationProcess.FindCenter)
             {  
-                if (GUI.Button(new Rect(left, top, 200, 35), "(1/2) Find Center"))
+                if (GUI.Button(new Rect(left, top, 150, 35), "(1/2) Find Center"))
                 {
-                    _userTracker.calibrationStatus = CalibrationProcess.FindForward;
-                    _userTracker.CalibrationStep1();
+                    
+                    if (_userTracker.CalibrationStep1())
+                    {
+                        _userTracker.CalibrationStatus = CalibrationProcess.FindForward;
+                    }
                 }
             }
-            else if (_userTracker.calibrationStatus == CalibrationProcess.FindForward)
+            else if (_userTracker.CalibrationStatus == CalibrationProcess.FindForward)
             {
-                if (GUI.Button(new Rect(left, top, 200, 35), "(2/2) Find Forward"))
+                if (GUI.Button(new Rect(left, top, 150, 35), "(2/2) Find Forward"))
                 {
-                    _userTracker.calibrationStatus = CalibrationProcess.FindCenter;
+                    _userTracker.CalibrationStatus = CalibrationProcess.FindCenter;
                     _userTracker.CalibrationStep2();
                     _menuAction = MenuAction.None;
                 }
