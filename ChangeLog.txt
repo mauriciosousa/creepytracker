@@ -1,0 +1,13 @@
+# Change Log
+All notable changes to this project will be documented in this file.
+http://keepachangelog.com/
+
+## [Unreleased]
+
+## [1.0a] 2016-02-22
++ UDP Frame Broadcast
++ Save/Load Calibration
++ Calibration
++ Merge Humans
++ Receive RPC Data
++ Kinect Sensor Client RPC
