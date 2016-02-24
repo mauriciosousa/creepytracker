@@ -142,6 +142,9 @@ public class TrackerUI : MonoBehaviour {
             {
                 _userTracker.resetListening();
                 _userTracker.Save();
+
+				DoNotify n = gameObject.GetComponent<DoNotify>();
+				n.notifySend(NotificationLevel.INFO, "Udp Listening", "Listening to port " + TrackerProperties.Instance.listenPort, 2000);
             }
             top += 35;
 
@@ -155,10 +158,10 @@ public class TrackerUI : MonoBehaviour {
             {
                 _userTracker.resetBroadcast();
                 _userTracker.Save();
+
+				DoNotify n = gameObject.GetComponent<DoNotify>();
+				n.notifySend(NotificationLevel.INFO, "Udp Broadcast", "Sending to port " + TrackerProperties.Instance.broadcastPort, 2000);
             }
-
-
-
         }
 
         if (Input.GetMouseButtonDown(0))

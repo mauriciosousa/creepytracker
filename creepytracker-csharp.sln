@@ -1,11 +1,11 @@
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2008
 
-Project("{165C035D-54FF-DC3A-870E-A5D05D9345A0}") = "creepytracker", "Assembly-CSharp-firstpass.csproj", "{30538011-45DD-6091-CC15-C17907743252}"
+Project("{165C035D-54FF-DC3A-870E-A5D05D9345A0}") = "creepytracker", "Assembly-CSharp-firstpass-vs.csproj", "{30538011-45DD-6091-CC15-C17907743252}"
 EndProject
-Project("{165C035D-54FF-DC3A-870E-A5D05D9345A0}") = "creepytracker", "Assembly-CSharp.csproj", "{DDB3B6E7-6385-77B7-864F-613B4C4C04A3}"
+Project("{165C035D-54FF-DC3A-870E-A5D05D9345A0}") = "creepytracker", "Assembly-CSharp-vs.csproj", "{DDB3B6E7-6385-77B7-864F-613B4C4C04A3}"
 EndProject
-Project("{165C035D-54FF-DC3A-870E-A5D05D9345A0}") = "creepytracker", "Assembly-CSharp-Editor-firstpass.csproj", "{BDE03B51-17E9-3AA1-0BAA-699873EB2334}"
+Project("{165C035D-54FF-DC3A-870E-A5D05D9345A0}") = "creepytracker", "Assembly-CSharp-Editor-firstpass-vs.csproj", "{BDE03B51-17E9-3AA1-0BAA-699873EB2334}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,7 +29,7 @@ Global
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
-												GlobalSection(MonoDevelopProperties) = preSolution
+													GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = Assembly-CSharp.csproj
 		Policies = $0
 		$0.TextStylePolicy = $1
