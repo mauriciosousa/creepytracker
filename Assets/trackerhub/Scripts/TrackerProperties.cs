@@ -1,11 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class TrackerProperties : MonoBehaviour {
 
     private static TrackerProperties _singleton;
 
-    public int rpcPort = 57743;
+    public int listenPort = 57743;
     public int broadcastPort = 53804;
 
     [Range(0, 1)]
@@ -20,7 +21,10 @@ public class TrackerProperties : MonoBehaviour {
 
     public string configFilename = "configSettings.txt";
 
-    private TrackerProperties() { }
+    private TrackerProperties()
+    {
+        _singleton = this;
+    }
 
     public static TrackerProperties Instance
     {
@@ -32,6 +36,6 @@ public class TrackerProperties : MonoBehaviour {
 
     void Start()
     {
-        _singleton = this;
+        //_singleton = this;
     }
 }

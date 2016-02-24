@@ -55,6 +55,10 @@ public class HumanSkeleton : MonoBehaviour {
 
     void Start ()
     {
+        CapsuleCollider collider = gameObject.AddComponent<CapsuleCollider>();
+        collider.radius = 0.25f;
+        collider.height = 1.75f;
+
         head = createSphere("head", 0.3f);
         leftShoulder = createSphere("leftShoulder");
         rightShoulder = createSphere("rightShoulder");
@@ -104,6 +108,7 @@ public class HumanSkeleton : MonoBehaviour {
     private GameObject createSphere(string name, float scale = 0.1f)
     {
         GameObject gameObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        gameObject.GetComponent<SphereCollider>().enabled = false;
         gameObject.transform.parent = transform;
         gameObject.transform.localScale = new Vector3(scale, scale, scale);
         gameObject.name = name;
@@ -204,4 +209,10 @@ public class HumanSkeleton : MonoBehaviour {
         else
             throw new Exception("Human not initalized.");
     }
+
+    public Vector3 getHead()
+    {
+        return headKalman.Value;
+    }
+
 }

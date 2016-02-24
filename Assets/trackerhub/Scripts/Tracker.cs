@@ -33,6 +33,11 @@ public class Sensor
 
     private List<Vector3> _floorValues;
 
+    private static int materialIndex = 0;
+    private static List<Material> _materials;
+
+    private Material _material;
+
     public bool Active
     {
         get
@@ -55,6 +60,19 @@ public class Sensor
         }
     }
 
+    public Material Material
+    {
+        get
+        {
+            return _material;
+        }
+
+        set
+        {
+            _material = value;
+        }
+    }
+
     public Sensor(string sensorID, GameObject sensorGameObject)
     {
         bodies = new Dictionary<string, SensorBody>();
@@ -68,6 +86,10 @@ public class Sensor
         up1 = new Vector3();
         up2 = new Vector3();
         _floorValues = new List<Vector3>();
+
+        _material = _chooseMaterial();
+        CommonUtils.changeGameObjectMaterial(_sensorGameObject, _material);
+        
     }
 
     internal Vector3 pointSensorToScene(Vector3 p)
@@ -77,6 +99,7 @@ public class Sensor
 
     internal void updateBodies()
     {
+
         BodiesMessage bodiesMessage = lastBodiesMessage;
 
         if (bodiesMessage == null) return;
@@ -109,6 +132,7 @@ public class Sensor
             else
             {   // new bodies
                 b = new SensorBody(sk.ID, SensorGameObject.transform);
+                b.gameObject.GetComponent<Renderer>().material = Material;
                 bodies[sk.ID] = b;
                 b.sensorID = SensorID;
             }
@@ -193,6 +217,36 @@ public class Sensor
     {
         SensorGameObject.transform.position += positiondelta;
     }
+
+    private static Material _chooseMaterial()
+    {
+        if (_materials == null)
+        {
+            System.Random rng = new System.Random();
+            int n = CommonUtils.colors.Count;
+            while (n > 1)
+            {
+                n--;
+                int k = rng.Next(n + 1);
+                Color value = CommonUtils.colors[k];
+                CommonUtils.colors[k] = CommonUtils.colors[n];
+                CommonUtils.colors[n] = value;
+            }
+
+
+
+            _materials = new List<Material>();
+            for (int i = 0; i < CommonUtils.colors.Count; i++)
+            {
+                Material aux = new Material(Shader.Find("Standard"));
+                aux.color = CommonUtils.colors[i];
+                _materials.Add(aux);
+            }
+        }
+        Material m = _materials[materialIndex];
+        materialIndex = (materialIndex + 1) % _materials.Count;
+        return m;
+    }
 }
 
 public class SensorBody
@@ -226,9 +280,12 @@ public class SensorBody
     public SensorBody(string ID, Transform parent)
     {
         this.ID = ID;
-        gameObject = new GameObject();// GameObject.CreatePrimitive(PrimitiveType.Cube);
+        gameObject = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+        gameObject.GetComponent<CapsuleCollider>().enabled = false;
+        gameObject.transform.localScale = new Vector3(0.4f, 0.5f, 0.4f);
         gameObject.name = this.ID;
         gameObject.transform.parent = parent;
+        gameObject.GetComponent<Renderer>().enabled = false;
     }
 }
 
@@ -240,6 +297,13 @@ public class Human
     public DateTime timeOfDeath;
     public string seenBySensor;
     private HumanSkeleton skeleton;
+    public HumanSkeleton Skeleton
+    {
+        get
+        {
+            return skeleton;
+        }
+    }
 
     private Vector3 position;
     public Vector3 Position
@@ -256,13 +320,16 @@ public class Human
         }
     }
 
+
+
     public Human(GameObject gameObject, Tracker tracker)
     {
         ID = CommonUtils.getNewID();
         bodies = new List<SensorBody>();
         this.gameObject = gameObject;
         this.gameObject.name = "Human " + ID;
-
+        
+        
         skeleton = this.gameObject.GetComponent<HumanSkeleton>();
         skeleton.tracker = tracker;
         skeleton.ID = ID;
@@ -271,7 +338,7 @@ public class Human
 
     internal string getPDU()
     {
-        return skeleton.getPDU();
+        return Skeleton.getPDU();
     }
 }
 
@@ -306,6 +373,8 @@ public class Tracker : MonoBehaviour {
     private List<Human> _humansToKill;
 
     private UdpBroadcast _udpBroadcast;
+
+    public int showHumanBodies = -1;
 
     void Start ()
     {
@@ -364,7 +433,47 @@ public class Tracker : MonoBehaviour {
             { }
         }
 
+        foreach (Human h in _deadHumans)
+        {
+            try
+            {
+                strToSend += MessageSeparators.L1 + h.getPDU();
+            }
+            catch (Exception e)
+            { }
+        }
+
         _udpBroadcast.send(strToSend);
+
+        // set human material
+
+        foreach (Human h in _humans.Values)
+        {
+            if (h.seenBySensor != null) CommonUtils.changeGameObjectMaterial(h.gameObject, Sensors[h.seenBySensor].Material);
+        }
+
+        // show / hide human bodies
+
+        if (showHumanBodies != -1 && !_humans.ContainsKey(showHumanBodies))
+            showHumanBodies = -1;
+
+        foreach (Human h in _humans.Values)
+        {
+            CapsuleCollider collider = h.gameObject.GetComponent<CapsuleCollider>();
+            if(collider != null)
+                collider.enabled = (showHumanBodies == -1);
+
+            foreach (Transform child in h.gameObject.transform)
+            {
+                if (child.gameObject.GetComponent<Renderer>() != null)
+                    child.gameObject.GetComponent<Renderer>().enabled = (showHumanBodies == -1);
+            }
+
+            foreach (SensorBody b in h.bodies)
+            {
+                b.gameObject.GetComponent<Renderer>().enabled = (showHumanBodies == h.ID);
+            }
+        }
     }
 
     private void mergeHumans()
@@ -541,9 +650,13 @@ public class Tracker : MonoBehaviour {
 
     internal void setNewFrame(BodiesMessage bodies)
     {
+        //Debug.Log(bodies.KinectId);
+
         if (!Sensors.ContainsKey(bodies.KinectId))
         {
-            Sensors[bodies.KinectId] = new Sensor(bodies.KinectId, (GameObject) Instantiate(Resources.Load("Prefabs/KinectSensorPrefab"), Vector3.zero, Quaternion.identity));
+            Vector3 position = new Vector3(Mathf.Ceil(Sensors.Count / 2.0f) * (Sensors.Count % 2 == 0 ? -1.0f : 1.0f), 1, 0);
+
+            Sensors[bodies.KinectId] = new Sensor(bodies.KinectId, (GameObject) Instantiate(Resources.Load("Prefabs/KinectSensorPrefab"), position, Quaternion.identity));
         }
 
         Sensors[bodies.KinectId].lastBodiesMessage = bodies;
@@ -563,7 +676,7 @@ public class Tracker : MonoBehaviour {
 
         if (cannotCalibrate)
         {
-            DoNotify n = GameObject.Find("NetworkManager").GetComponent<DoNotify>();
+            DoNotify n = gameObject.GetComponent<DoNotify>();
             n.notifySend(NotificationLevel.IMPORTANT, "Calibration error", "Incorrect user placement!", 5000);
         }
 
@@ -599,7 +712,7 @@ public class Tracker : MonoBehaviour {
 
         _saveConfig();
 
-        DoNotify n = GameObject.Find("NetworkManager").GetComponent<DoNotify>();
+        DoNotify n = gameObject.GetComponent<DoNotify>();
         n.notifySend(NotificationLevel.INFO, "Calibration complete", "Config file updated", 5000);
     }
 
@@ -633,9 +746,30 @@ public class Tracker : MonoBehaviour {
     {
         int n = 1;
 
-        foreach (Human h in _humans.Values)
+        if (showHumanBodies == -1)
         {
-            GUI.Label(new Rect(10, Screen.height - (n++ * 50), 1000, 50), "Human " + h.ID + " as seen by " + h.seenBySensor);
+            foreach (Human h in _humans.Values)
+            {
+                //GUI.Label(new Rect(10, Screen.height - (n++ * 50), 1000, 50), "Human " + h.ID + " as seen by " + h.seenBySensor);
+
+                Vector3 p = Camera.main.WorldToScreenPoint(h.Skeleton.getHead() + new Vector3(0, 0.2f, 0));
+                if (p.z > 0)
+                {
+                    GUI.Label(new Rect(p.x, Screen.height - p.y - 25, 100, 25), "" + h.ID);
+                }
+            }
+        }
+
+        foreach (Sensor s in Sensors.Values)
+        {
+            if (s.Active)
+            {
+                Vector3 p = Camera.main.WorldToScreenPoint(s.SensorGameObject.transform.position + new Vector3(0, 0.05f, 0));
+                if (p.z > 0)
+                {
+                    GUI.Label(new Rect(p.x, Screen.height - p.y - 25, 100, 25), "" + s.SensorID);
+                }
+            }
         }
     }
 
@@ -645,6 +779,9 @@ public class Tracker : MonoBehaviour {
         ConfigProperties.clear(filePath);
 
         // save properties
+        ConfigProperties.save(filePath, "udp.listenport", "" + TrackerProperties.Instance.listenPort);
+        ConfigProperties.save(filePath, "udp.broadcastport", "" + TrackerProperties.Instance.broadcastPort);
+
 
 
         // save sensors
@@ -663,7 +800,19 @@ public class Tracker : MonoBehaviour {
     {
         string filePath = Application.dataPath + "/" + TrackerProperties.Instance.configFilename;
 
-        //Debug.Log(ConfigProperties.load(filePath, "exampleValue"));
+        string port = ConfigProperties.load(filePath, "udp.listenport");
+        if (port != "")
+        {
+            TrackerProperties.Instance.listenPort = int.Parse(port);
+        }
+        resetListening();
+
+        port = ConfigProperties.load(filePath, "udp.broadcastport");
+        if (port != "")
+        {
+            TrackerProperties.Instance.broadcastPort = int.Parse(port);
+        }
+        resetBroadcast();
     }
 
     private void _loadSavedSensors()
@@ -689,8 +838,18 @@ public class Tracker : MonoBehaviour {
         }
     }
 
-    internal void resetBroadcast()
+    public void resetBroadcast()
     {
         _udpBroadcast.reset(TrackerProperties.Instance.broadcastPort);
+    }
+
+    public void resetListening()
+    {
+        gameObject.GetComponent<UdpListener>().udpRestart();
+    }
+
+    public void Save()
+    {
+        _saveConfig();
     }
 }

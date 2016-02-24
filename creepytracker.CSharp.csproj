@@ -85,6 +85,7 @@
     <Compile Include="Assets\common\Plugins\KalmanFilterFloat.cs" />
     <Compile Include="Assets\common\Plugins\KalmanFilterVector3.cs" />
     <Compile Include="Assets\common\Plugins\UdpBroadcast.cs" />
+    <Compile Include="Assets\common\Plugins\UdpListener.cs" />
     <Compile Include="Assets\common\Scripts\CameraOrbit.cs" />
     <Compile Include="Assets\common\Scripts\DoNotify.cs" />
     <Compile Include="Assets\common\Scripts\GridOverlay.cs" />

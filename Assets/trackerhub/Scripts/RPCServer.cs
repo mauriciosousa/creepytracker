@@ -17,7 +17,7 @@ public class RPCServer : MonoBehaviour {
     {
         showNetworkOptions = false;
 
-        port = "" + TrackerProperties.Instance.rpcPort;
+        port = "" + TrackerProperties.Instance.listenPort;
         broadcastPort = "" + TrackerProperties.Instance.broadcastPort;
 
         Network.InitializeServer(32, int.Parse(port), false);

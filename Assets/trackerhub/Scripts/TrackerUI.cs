@@ -7,30 +7,23 @@ enum MenuAction
     Sensors,
     Humans,
     Devices,
+    NetworkSettings,
     None
 }
 
 public class TrackerUI : MonoBehaviour {
 
-    public Texture checkTex;
-    public Texture uncheckTex;
+    public Texture checkTexture;
+    public Texture uncheckTexture;
 
-    public Texture deviceTex_on;
-    public Texture deviceTex_off;
+    public Texture sensorTextureOn;
+    public Texture sensorTextureOff;
 
-    public Texture humanTex_on;
-    public Texture humanTex_off;
+    public Texture settingsTextureOn;
+    public Texture settingsTextureOff;
 
-    public Texture sensorTex_on;
-    public Texture sensorTex_off;
-
-    public Texture settingsTex_on;
-    public Texture settingsTex_off;
-
-    public Texture network_connected;
-    public Texture network_disconnected;
-    public Texture network_receiving_only;
-    public Texture network_sendinging_only;
+    public Texture networkTextureOn;
+    public Texture networkTextureOff;
 
     [Range(20, 100)]
     public int iconSize;
@@ -56,18 +49,20 @@ public class TrackerUI : MonoBehaviour {
         int top = 5;
         int left = 20;
 
-        displayMenuButton(MenuAction.Sensors, sensorTex_on, sensorTex_off, new Rect(left, top + iconSize / 2, iconSize, iconSize));
-        GUI.Label(new Rect(left + iconSize, top + iconSize, 10, 25), "" + _userTracker.Sensors.Count);
+        displayMenuButton(MenuAction.Sensors, sensorTextureOn, sensorTextureOff, new Rect(left, top, iconSize, iconSize));
+        GUI.Label(new Rect(left + iconSize, top + iconSize - 20, 10, 25), "" + _userTracker.Sensors.Count);
         left += iconSize + iconSize / 2;
         
         //displayMenuButton(MenuAction.Devices, deviceTex_on, deviceTex_off, new Rect(left, top, iconSize, iconSize));
         //left += iconSize + iconSize / 2;
-        displayMenuButton(MenuAction.Settings, settingsTex_on, settingsTex_off, new Rect(left, top, iconSize, iconSize));
+        displayMenuButton(MenuAction.Settings, settingsTextureOn, settingsTextureOff, new Rect(left, top, iconSize, iconSize));
 
+        left = Screen.width - iconSize - 10;
+        displayMenuButton(MenuAction.NetworkSettings, networkTextureOn, networkTextureOff, new Rect(left, top, iconSize, iconSize));
 
         if (_menuAction == MenuAction.Sensors)
         {
-            top = 5 + 2*iconSize;
+            top = iconSize + iconSize / 2;
             left = 20;
 
             GUI.Box(new Rect(left - 10, top - 10, 200, _userTracker.Sensors.Count == 0 ? 50 : 50 * _userTracker.Sensors.Count), "");
@@ -76,7 +71,7 @@ public class TrackerUI : MonoBehaviour {
             {
                 foreach (string sid in _userTracker.Sensors.Keys)
                 {
-                    if (GUI.Button(new Rect(left, top, 20, 20), _userTracker.Sensors[sid].Active ? checkTex : uncheckTex, GUIStyle.none))
+                    if (GUI.Button(new Rect(left, top, 20, 20), _userTracker.Sensors[sid].Active ? checkTexture : uncheckTexture, GUIStyle.none))
                     {
                         _userTracker.Sensors[sid].Active = !_userTracker.Sensors[sid].Active;
                     }
@@ -93,7 +88,7 @@ public class TrackerUI : MonoBehaviour {
 
         if (_menuAction == MenuAction.Settings)
         {
-            top = 5 + 2 * iconSize;
+            top = iconSize + iconSize / 2;
             left = iconSize + 50;
 
             GUI.Box(new Rect(left, top - 10, 200, 100), "");
@@ -126,18 +121,67 @@ public class TrackerUI : MonoBehaviour {
 
         }
 
+        if (_menuAction == MenuAction.NetworkSettings)
+        {
+            top = iconSize + iconSize / 2;
+            left = Screen.width - 250;
+
+            GUI.Box(new Rect(left, top - 10, 240, 140), "");
+            left += 10;
+
+            GUI.Label(new Rect(left, top, 200, 25), "Network Settings:");
+            left += 10;
+            top += 35;
+
+            GUI.Label(new Rect(left, top, 150, 25), "Sensors port:");
+            left += 100;
+
+            TrackerProperties.Instance.listenPort = int.Parse(GUI.TextField(new Rect(left, top, 50, 20), "" + TrackerProperties.Instance.listenPort));
+            left += 55;
+            if (GUI.Button(new Rect(left, top, 50, 25), "Reset"))
+            {
+                _userTracker.resetListening();
+                _userTracker.Save();
+            }
+            top += 35;
+
+            left = Screen.width - 250 + 20;
+            GUI.Label(new Rect(left, top, 150, 25), "Broadcast port:");
+            left += 100;
+
+            TrackerProperties.Instance.broadcastPort = int.Parse(GUI.TextField(new Rect(left, top, 50, 20), "" + TrackerProperties.Instance.broadcastPort));
+            left += 55;
+            if (GUI.Button(new Rect(left, top, 50, 25), "Reset"))
+            {
+                _userTracker.resetBroadcast();
+                _userTracker.Save();
+            }
 
 
 
-        //RaycastHit hit;
-        //Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        //if (Physics.Raycast(ray, out hit))
-        //    if (hit.collider != null)
-        //    {
-        //        Debug.Log(hit.transform.gameObject.name);
-        //    }
+        }
 
-
+        if (Input.GetMouseButtonDown(0))
+        {
+            RaycastHit hit;
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            if (Physics.Raycast(ray, out hit))
+            {
+                if (hit.collider != null)
+                {
+                    if (hit.collider.gameObject.name.Contains("Human"))
+                    {
+                        _userTracker.showHumanBodies = int.Parse(hit.collider.gameObject.name.Remove(0, "Human ".Length));
+                    }
+                    else
+                        _userTracker.showHumanBodies = -1;
+                }
+                else
+                    _userTracker.showHumanBodies = -1;
+            }
+            else
+                _userTracker.showHumanBodies = -1;
+        }
     }
 
     void displayMenuButton(MenuAction button, Texture texon, Texture texoff, Rect rect)

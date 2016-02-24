@@ -1,11 +1,8 @@
 ﻿using UnityEngine;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Net;
 using System.Net.Sockets;
-using System.Threading;
 
 public class UdpBroadcast
 {
@@ -35,7 +32,6 @@ public class UdpBroadcast
 			
 			_remoteEndPoint = new IPEndPoint(IPAddress.Broadcast, _port);
 			_udp = new UdpClient();
-			Debug.Log("[UDP Send] broadcasting to port " + port);
 			_streaming = true;
 		}
 		catch (Exception e) { }
