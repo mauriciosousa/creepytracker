@@ -32,12 +32,16 @@ public class TrackerUI : MonoBehaviour {
 
     private Tracker _userTracker;
 
+	private GUIStyle _titleStyle;
+
     void Start()
     {
         _userTracker = gameObject.GetComponent<Tracker>();
         _menuAction = MenuAction.None;
 
-        
+		_titleStyle = new GUIStyle ();
+		_titleStyle.fontStyle = FontStyle.Bold;
+		_titleStyle.normal.textColor = Color.white;
     }
 	
 	void Update () {
@@ -65,10 +69,14 @@ public class TrackerUI : MonoBehaviour {
             top = iconSize + iconSize / 2;
             left = 20;
 
-            GUI.Box(new Rect(left - 10, top - 10, 200, _userTracker.Sensors.Count == 0 ? 50 : 50 * _userTracker.Sensors.Count), "");
+            GUI.Box(new Rect(left - 10, top - 10, 200, _userTracker.Sensors.Count == 0 ? 50 : 65 * _userTracker.Sensors.Count), "");
+
 
             if (_userTracker.Sensors.Count > 0)
             {
+				GUI.Label(new Rect(left, top, 200, 25), "Sensors:", _titleStyle);
+				top += 35;
+
                 foreach (string sid in _userTracker.Sensors.Keys)
                 {
                     if (GUI.Button(new Rect(left, top, 20, 20), _userTracker.Sensors[sid].Active ? checkTexture : uncheckTexture, GUIStyle.none))
@@ -94,14 +102,13 @@ public class TrackerUI : MonoBehaviour {
             GUI.Box(new Rect(left, top - 10, 200, 100), "");
             left += 10;
 
-            GUI.Label(new Rect(left, top, 500, 35), "Calibration: ");
+            GUI.Label(new Rect(left, top, 500, 35), "Calibration: ", _titleStyle);
             top += 40;
 
             if (_userTracker.CalibrationStatus == CalibrationProcess.FindCenter)
             {  
                 if (GUI.Button(new Rect(left, top, 150, 35), "(1/2) Find Center"))
                 {
-                    
                     if (_userTracker.CalibrationStep1())
                     {
                         _userTracker.CalibrationStatus = CalibrationProcess.FindForward;
@@ -129,7 +136,7 @@ public class TrackerUI : MonoBehaviour {
             GUI.Box(new Rect(left, top - 10, 240, 140), "");
             left += 10;
 
-            GUI.Label(new Rect(left, top, 200, 25), "Network Settings:");
+            GUI.Label(new Rect(left, top, 200, 25), "Network Settings:", _titleStyle);
             left += 10;
             top += 35;
 

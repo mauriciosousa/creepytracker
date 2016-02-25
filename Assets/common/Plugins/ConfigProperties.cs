@@ -10,6 +10,16 @@ public class ConfigProperties
         File.Create(filename).Close();
     }
 
+	private static char LineComment = '%';
+
+	public static void writeComment (string filename, string line)
+	{
+		using (StreamWriter file = new StreamWriter(filename))
+		{
+			file.WriteLine(LineComment + line);
+		}
+	}
+
 	public static void save(string filename, string property, string value)
 	{
 		if (File.Exists(filename))
@@ -18,7 +28,7 @@ public class ConfigProperties
 			int index = - 1;
 			foreach (string line in lines)
 			{
-				if (line.Split('=')[0] == property)
+				if (line.Split('=')[0] == property && line[0] == LineComment)
 				{
 					index = lines.IndexOf(line);
 				}

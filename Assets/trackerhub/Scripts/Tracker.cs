@@ -448,6 +448,8 @@ public class Tracker : MonoBehaviour {
         string filePath = Application.dataPath + "/" + TrackerProperties.Instance.configFilename;
         ConfigProperties.clear(filePath);
 
+		ConfigProperties.writeComment(filePath, "Config File created in " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+
         // save properties
         ConfigProperties.save(filePath, "udp.listenport", "" + TrackerProperties.Instance.listenPort);
         ConfigProperties.save(filePath, "udp.broadcastport", "" + TrackerProperties.Instance.broadcastPort);
