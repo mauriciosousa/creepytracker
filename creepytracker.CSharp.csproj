@@ -92,6 +92,9 @@
     <Compile Include="Assets\common\Scripts\UdpListener.cs" />
     <Compile Include="Assets\sensorclient-DEPRECATED\Plugins\SimpleCalibData.cs" />
     <Compile Include="Assets\sensorclient-DEPRECATED\Scripts\RPCClient.cs" />
+    <Compile Include="Assets\trackerhub\Plugins\Human.cs" />
+    <Compile Include="Assets\trackerhub\Plugins\Sensor.cs" />
+    <Compile Include="Assets\trackerhub\Plugins\SensorBody.cs" />
     <Compile Include="Assets\trackerhub\Scripts\HumanSkeleton.cs" />
     <Compile Include="Assets\trackerhub\Scripts\RPCServer.cs" />
     <Compile Include="Assets\trackerhub\Scripts\Tracker.cs" />
