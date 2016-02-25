@@ -85,13 +85,13 @@
     <Compile Include="Assets\common\Plugins\KalmanFilterFloat.cs" />
     <Compile Include="Assets\common\Plugins\KalmanFilterVector3.cs" />
     <Compile Include="Assets\common\Plugins\UdpBroadcast.cs" />
-    <Compile Include="Assets\common\Plugins\UdpListener.cs" />
     <Compile Include="Assets\common\Scripts\CameraOrbit.cs" />
     <Compile Include="Assets\common\Scripts\DoNotify.cs" />
     <Compile Include="Assets\common\Scripts\GridOverlay.cs" />
     <Compile Include="Assets\common\Scripts\Logger.cs" />
-    <Compile Include="Assets\sensorclient\Plugins\SimpleCalibData.cs" />
-    <Compile Include="Assets\sensorclient\Scripts\RPCClient.cs" />
+    <Compile Include="Assets\common\Scripts\UdpListener.cs" />
+    <Compile Include="Assets\sensorclient-DEPRECATED\Plugins\SimpleCalibData.cs" />
+    <Compile Include="Assets\sensorclient-DEPRECATED\Scripts\RPCClient.cs" />
     <Compile Include="Assets\trackerhub\Scripts\HumanSkeleton.cs" />
     <Compile Include="Assets\trackerhub\Scripts\RPCServer.cs" />
     <Compile Include="Assets\trackerhub\Scripts\Tracker.cs" />
