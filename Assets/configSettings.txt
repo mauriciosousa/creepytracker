@@ -1,1 +1,4 @@
-%Config File created in 2016-02-25 21:44:24
+%Config File created in 2016-03-22 16:21:39
+udp.listenport=55555
+udp.broadcastport=55558
+kinect.AVESTRUZ=AVESTRUZ;0;1;0;0;0;0;1

@@ -36,7 +36,11 @@ public class UdpBroadcast
 
 			Debug.Log("[UDP Broadcast] Sending at port: " + _port);
 		}
-		catch (Exception e) { }
+		catch (Exception e)
+        {
+            Debug.LogError(e.Message);
+            Debug.LogError(e.StackTrace);
+        }
 	}
 	
 	public void send(string line)
@@ -55,7 +59,8 @@ public class UdpBroadcast
 			catch (Exception e)
 			{
 				Debug.LogError("[UDP Send] " + e.Message);
-			}
+                Debug.LogError(e.StackTrace);
+            }
 		}
 	}
 }

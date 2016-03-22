@@ -12,8 +12,8 @@ public class TrackerProperties : MonoBehaviour {
     [Range(0, 1)]
     public float mergeDistance = 0.3f;
 
-    [Range(0, 25)]
-    public int confidenceTreshold = 20;
+    [Range(0, 13)]
+    public int confidenceTreshold = 5;
 
     public Windows.Kinect.JointType centerJoint = Windows.Kinect.JointType.SpineShoulder;
     public Windows.Kinect.JointType upJointA = Windows.Kinect.JointType.SpineBase;

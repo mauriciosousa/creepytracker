@@ -320,8 +320,6 @@ public class Tracker : MonoBehaviour {
 
     internal void setNewFrame(BodiesMessage bodies)
     {
-        //Debug.Log(bodies.KinectId);
-
         if (!Sensors.ContainsKey(bodies.KinectId))
         {
             Vector3 position = new Vector3(Mathf.Ceil(Sensors.Count / 2.0f) * (Sensors.Count % 2 == 0 ? -1.0f : 1.0f), 1, 0);
@@ -337,11 +335,14 @@ public class Tracker : MonoBehaviour {
         bool cannotCalibrate = false;
         foreach (Sensor sensor in _sensors.Values)
         {
-            if (sensor.lastBodiesMessage != null && sensor.lastBodiesMessage.Bodies.Count == 1 && sensor.Active)
+            if (sensor.Active)
             {
-                sensor.calibrationStep1();
+                if (sensor.lastBodiesMessage != null && sensor.lastBodiesMessage.Bodies.Count == 1)
+                {
+                    sensor.calibrationStep1();
+                }
+                else cannotCalibrate = true;
             }
-            else cannotCalibrate = true;
         }
 
         if (cannotCalibrate)

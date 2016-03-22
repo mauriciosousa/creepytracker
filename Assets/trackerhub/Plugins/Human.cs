@@ -34,8 +34,6 @@ public class Human
         }
     }
 
-
-
     public Human(GameObject gameObject, Tracker tracker)
     {
         ID = CommonUtils.getNewID();
