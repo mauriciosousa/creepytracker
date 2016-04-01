@@ -95,6 +95,10 @@ public class Tracker : MonoBehaviour {
 
         foreach (Human h in _humans.Values)
         {
+            // udpate Human Skeleton
+            h.updateSkeleton();
+
+            // get PDU
             try
             {
                 strToSend += MessageSeparators.L1 + h.getPDU();

@@ -132,13 +132,13 @@ public class HumanSkeleton : MonoBehaviour {
         return gameObject;
     }
 
-    /*private Vector3 calcUnfilteredForward()
+    private Vector3 calcUnfilteredForward()
     {
         Vector3 spineRight = (mirror ? tracker.getJointPosition(ID, JointType.ShoulderLeft) : tracker.getJointPosition(ID, JointType.ShoulderRight)) - tracker.getJointPosition(ID, JointType.SpineShoulder);
         Vector3 spineUp = tracker.getJointPosition(ID, JointType.SpineShoulder) - tracker.getJointPosition(ID, JointType.SpineMid);
 
         return Vector3.Cross(spineRight, spineUp);
-    }*/
+    }
 
     private Vector3 calcForward()
     {
@@ -148,58 +148,43 @@ public class HumanSkeleton : MonoBehaviour {
         return Vector3.Cross(spineRight, spineUp);
     }
 
-    void Update ()
-    {
-        updateSkeleton();
-
-        // Update Forward (mirror or not to mirror?)
-
-        if (tracker.humanHasBodies(ID))
-        {
-            Vector3 forward = calcForward();
-
-            forwardGO.transform.forward = forward;
-            forwardGO.transform.position = spineMid.transform.position;
-
-            if (lastForward != Vector3.zero)
-            {
-                if(Vector3.Angle(lastForward, -forward) < Vector3.Angle(lastForward, forward))
-                {
-                    mirror = !mirror;
-                    forward = calcForward();
-                }
-
-                /*Vector3 projectedForward = new Vector3(forward.x, 0, forward.z);
-                Vector3 projectedLastForward = new Vector3(lastForward.x, 0, lastForward.z);
-
-                float rotation = Vector3.Angle(projectedLastForward, projectedForward);
-
-                if (rotation > 135)
-                {
-                    mirror = !mirror;
-                    forward = calcUnfilteredForward();
-                }*/
-
-                // Front for sure?
-
-                Vector3 rightElbowWrist = rightWristKalman.Value - rightElbowKalman.Value;
-                Vector3 leftElbowWrist = leftWristKalman.Value - leftElbowKalman.Value;
-
-                if (mirror && (Vector3.Angle(rightElbowWrist, -forward) < 30 || Vector3.Angle(leftElbowWrist, -forward) < 30))
-                {
-                    mirror = !mirror;
-                    forward = calcForward();
-                }
-            }
-
-            lastForward = forward;
-        }
-    }
-
     public void updateSkeleton()
     {
         if (tracker.humanHasBodies(ID))
         {
+            // Update Forward (mirror or not to mirror?)
+
+            Vector3 forward = calcUnfilteredForward();
+
+            if (lastForward != Vector3.zero)
+            {
+                Vector3 projectedForward = new Vector3(forward.x, 0, forward.z);
+                Vector3 projectedLastForward = new Vector3(lastForward.x, 0, lastForward.z);
+
+                if (Vector3.Angle(projectedLastForward, projectedForward) > 90)
+                //if (Vector3.Angle(projectedLastForward, -projectedForward) < Vector3.Angle(projectedLastForward, projectedForward)) // the same as above
+                {
+                    mirror = !mirror;
+                    forward = calcUnfilteredForward();
+                    projectedForward = new Vector3(forward.x, 0, forward.z);
+                }
+
+                // Front for sure?
+
+                Vector3 elbowHand1 = tracker.getJointPosition(ID, JointType.HandRight) - tracker.getJointPosition(ID, JointType.ElbowRight);
+                Vector3 elbowHand2 = tracker.getJointPosition(ID, JointType.HandLeft) - tracker.getJointPosition(ID, JointType.ElbowLeft);
+
+                if (Vector3.Angle(elbowHand1, -projectedForward) < 30 || Vector3.Angle(elbowHand2, -projectedForward) < 30)
+                {
+                    mirror = !mirror;
+                    forward = calcUnfilteredForward();
+                }
+            }
+
+            lastForward = forward;
+
+            // Update Joints
+
             headKalman.Value = tracker.getJointPosition(ID, JointType.Head);
             neckKalman.Value = tracker.getJointPosition(ID, JointType.Neck);
             spineShoulderKalman.Value = tracker.getJointPosition(ID, JointType.SpineShoulder);
@@ -269,6 +254,11 @@ public class HumanSkeleton : MonoBehaviour {
             rightKnee.transform.position = rightKneeKalman.Value;
             leftFoot.transform.position = leftFootKalman.Value;
             rightFoot.transform.position = rightFootKalman.Value;
+
+            // update forward
+
+            forwardGO.transform.forward = calcForward();
+            forwardGO.transform.position = spineMid.transform.position;
         }
     }
 
@@ -312,7 +302,6 @@ public class HumanSkeleton : MonoBehaviour {
             pdu += "rightFoot" + MessageSeparators.SET + CommonUtils.convertVectorToStringRPC(rightFootKalman.Value);
 
             return pdu;
-            
         }
         else
             throw new Exception("Human not initalized.");

@@ -48,6 +48,11 @@ public class Human
         skeleton.updateSkeleton();
     }
 
+    internal void updateSkeleton()
+    {
+        Skeleton.updateSkeleton();
+    }
+
     internal string getPDU()
     {
         return Skeleton.getPDU();
