@@ -8,6 +8,7 @@ enum MenuAction
     Humans,
     Devices,
     NetworkSettings,
+    About,
     None
 }
 
@@ -24,6 +25,9 @@ public class TrackerUI : MonoBehaviour {
 
     public Texture networkTextureOn;
     public Texture networkTextureOff;
+
+    public Texture aboutOn;
+    public Texture aboutOff;
 
     [Range(20, 100)]
     public int iconSize;
@@ -60,6 +64,10 @@ public class TrackerUI : MonoBehaviour {
         //displayMenuButton(MenuAction.Devices, deviceTex_on, deviceTex_off, new Rect(left, top, iconSize, iconSize));
         //left += iconSize + iconSize / 2;
         displayMenuButton(MenuAction.Settings, settingsTextureOn, settingsTextureOff, new Rect(left, top, iconSize, iconSize));
+
+        
+
+
 
         left = Screen.width - iconSize - 10;
         displayMenuButton(MenuAction.NetworkSettings, networkTextureOn, networkTextureOff, new Rect(left, top, iconSize, iconSize));

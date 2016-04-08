@@ -69,16 +69,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Kinect Example\KinectView\Scripts\BodySourceManager.cs" />
-    <Compile Include="Assets\Kinect Example\KinectView\Scripts\BodySourceView.cs" />
-    <Compile Include="Assets\Kinect Example\KinectView\Scripts\ColorSourceManager.cs" />
-    <Compile Include="Assets\Kinect Example\KinectView\Scripts\ColorSourceView.cs" />
-    <Compile Include="Assets\Kinect Example\KinectView\Scripts\DepthSourceManager.cs" />
-    <Compile Include="Assets\Kinect Example\KinectView\Scripts\DepthSourceView.cs" />
-    <Compile Include="Assets\Kinect Example\KinectView\Scripts\DisableOnStart.cs" />
-    <Compile Include="Assets\Kinect Example\KinectView\Scripts\InfraredSourceManager.cs" />
-    <Compile Include="Assets\Kinect Example\KinectView\Scripts\InfraredSourceView.cs" />
-    <Compile Include="Assets\Kinect Example\KinectView\Scripts\MultiSourceManager.cs" />
     <Compile Include="Assets\common\Plugins\BodiesMessage.cs" />
     <Compile Include="Assets\common\Plugins\CommonUtils.cs" />
     <Compile Include="Assets\common\Plugins\ConfigProperties.cs" />
@@ -90,8 +80,6 @@
     <Compile Include="Assets\common\Scripts\GridOverlay.cs" />
     <Compile Include="Assets\common\Scripts\Logger.cs" />
     <Compile Include="Assets\common\Scripts\UdpListener.cs" />
-    <Compile Include="Assets\sensorclient-DEPRECATED\Plugins\SimpleCalibData.cs" />
-    <Compile Include="Assets\sensorclient-DEPRECATED\Scripts\RPCClient.cs" />
     <Compile Include="Assets\trackerhub\Plugins\Human.cs" />
     <Compile Include="Assets\trackerhub\Plugins\Sensor.cs" />
     <Compile Include="Assets\trackerhub\Plugins\SensorBody.cs" />
