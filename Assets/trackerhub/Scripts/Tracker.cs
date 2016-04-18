@@ -44,6 +44,14 @@ public class Tracker : MonoBehaviour {
 
     private UdpBroadcast _udpBroadcast;
 
+    public string[] UnicastClients
+    {
+        get
+        {
+            return _udpBroadcast.UnicastClients;
+        }
+    }
+
     public int showHumanBodies = -1;
 
     void Start ()
@@ -320,6 +328,16 @@ public class Tracker : MonoBehaviour {
             _humansToKill.Add(h);
             _humans.Remove(h.ID);
         }
+    }
+
+    internal void addUnicast(string address, string port)
+    {
+        _udpBroadcast.addUnicast(address, int.Parse(port));
+    }
+
+    internal void removeUnicast(string key)
+    {
+        _udpBroadcast.removeUnicast(key);
     }
 
     internal void setNewFrame(BodiesMessage bodies)

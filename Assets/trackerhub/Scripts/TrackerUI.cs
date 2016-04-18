@@ -38,6 +38,10 @@ public class TrackerUI : MonoBehaviour {
 
 	private GUIStyle _titleStyle;
 
+
+    private string newUnicastAddress;
+    private string newUnicastPort;
+
     void Start()
     {
         _userTracker = gameObject.GetComponent<Tracker>();
@@ -46,6 +50,9 @@ public class TrackerUI : MonoBehaviour {
 		_titleStyle = new GUIStyle ();
 		_titleStyle.fontStyle = FontStyle.Bold;
 		_titleStyle.normal.textColor = Color.white;
+
+        newUnicastAddress = "";
+        newUnicastPort = "";
     }
 	
 	void Update () {
@@ -144,7 +151,7 @@ public class TrackerUI : MonoBehaviour {
             GUI.Box(new Rect(left, top - 10, 240, 140), "");
             left += 10;
 
-            GUI.Label(new Rect(left, top, 200, 25), "Network Settings:", _titleStyle);
+            GUI.Label(new Rect(left, top, 200, 25), "Broadcast Settings:", _titleStyle);
             left += 10;
             top += 35;
 
@@ -177,6 +184,41 @@ public class TrackerUI : MonoBehaviour {
 				DoNotify n = gameObject.GetComponent<DoNotify>();
 				n.notifySend(NotificationLevel.INFO, "Udp Broadcast", "Sending to port " + TrackerProperties.Instance.broadcastPort, 2000);
             }
+
+            // Unicast Settings
+            top += 80;
+            left = Screen.width - 250;
+
+            GUI.Box(new Rect(left, top - 10, 240, 140), "");
+            left += 10;
+
+            GUI.Label(new Rect(left, top, 200, 25), "Unicast Settings:", _titleStyle);
+            left += 10;
+            top += 35;
+
+            int addressTextFieldSize = 110;
+            newUnicastAddress = GUI.TextField(new Rect(left, top, addressTextFieldSize, 20), newUnicastAddress);
+            GUI.Label(new Rect(left + addressTextFieldSize + 3, top, 10, 25), ":");
+            newUnicastPort = GUI.TextField(new Rect(left + addressTextFieldSize + 10, top, 50, 20), newUnicastPort);
+            left += addressTextFieldSize + 1 + 15 + 50;
+            if (GUI.Button(new Rect(left, top, 40, 25), "Add"))
+            {
+                _userTracker.addUnicast(newUnicastAddress, newUnicastPort);
+                newUnicastAddress = "";
+                newUnicastPort = "";
+            }
+
+            left = Screen.width - 250 + 20;
+            foreach(string ip in _userTracker.UnicastClients)
+            {
+                top += 30;
+                GUI.Label(new Rect(left, top, 160, 25), ip);
+                if (GUI.Button(new Rect(left, top, 20, 20), "R"))
+                {
+                    _userTracker.removeUnicast(ip);
+                }
+            }
+
         }
 
         if (Input.GetMouseButtonDown(0))

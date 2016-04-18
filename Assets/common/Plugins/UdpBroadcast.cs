@@ -3,6 +3,7 @@ using System;
 using System.Text;
 using System.Net;
 using System.Net.Sockets;
+using System.Collections.Generic;
 
 public class UdpBroadcast
 {
@@ -17,11 +18,21 @@ public class UdpBroadcast
 
 	private bool _streaming = false;
 
-	public UdpBroadcast(int port, int sendRate = 100)
+    private Dictionary<string, IPEndPoint> _unicastClients;
+    public string[] UnicastClients
+    {
+        get
+        {
+            return (new List<string>(_unicastClients.Keys)).ToArray();
+        }
+    }
+
+    public UdpBroadcast(int port, int sendRate = 100)
 	{
 		_lastSent = DateTime.Now;
 		reset(port, sendRate);
-	}
+        _unicastClients = new Dictionary<string, IPEndPoint>();
+    }
 
 	public void reset(int port, int sendRate = 100)
 	{
@@ -52,8 +63,13 @@ public class UdpBroadcast
 				if (DateTime.Now > _lastSent)
 				{
 					byte[] data = Encoding.UTF8.GetBytes(line);
+
 					_udp.Send(data, data.Length, _remoteEndPoint);
-					_lastSent = DateTime.Now;
+
+                    foreach (IPEndPoint ip in _unicastClients.Values)
+                        _udp.Send(data, data.Length, ip);
+
+                    _lastSent = DateTime.Now;
 				}
 			}
 			catch (Exception e)
@@ -63,4 +79,31 @@ public class UdpBroadcast
             }
 		}
 	}
+
+
+
+    // Unicast Stuff
+
+    private string genUnicastKey(string address, int port)
+    {
+        return address + ":" + port;
+    }
+   
+    internal void addUnicast(string address, int port)
+    {
+        try
+        {
+            _unicastClients[genUnicastKey(address, port)] = new IPEndPoint(IPAddress.Parse(address), port);   
+        }
+        catch (Exception e)
+        {
+            Debug.LogError(e.Message);
+            Debug.LogError(e.StackTrace);
+        }
+    }
+
+    internal void removeUnicast(string key)
+    {if (_unicastClients.ContainsKey(key))
+            _unicastClients.Remove(key);
+    }
 }
