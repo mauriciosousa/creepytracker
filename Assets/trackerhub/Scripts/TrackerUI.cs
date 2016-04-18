@@ -84,7 +84,7 @@ public class TrackerUI : MonoBehaviour {
             top = iconSize + iconSize / 2;
             left = 20;
 
-            GUI.Box(new Rect(left - 10, top - 10, 200, _userTracker.Sensors.Count == 0 ? 50 : 65 * _userTracker.Sensors.Count), "");
+            GUI.Box(new Rect(left - 10, top - 10, 200, _userTracker.Sensors.Count == 0 ? 45 : (35 * _userTracker.Sensors.Count + 35 + 5)), "");
 
 
             if (_userTracker.Sensors.Count > 0)
@@ -148,7 +148,7 @@ public class TrackerUI : MonoBehaviour {
             top = iconSize + iconSize / 2;
             left = Screen.width - 250;
 
-            GUI.Box(new Rect(left, top - 10, 240, 140), "");
+            GUI.Box(new Rect(left, top - 10, 240, 120), "");
             left += 10;
 
             GUI.Label(new Rect(left, top, 200, 25), "Broadcast Settings:", _titleStyle);
@@ -186,10 +186,10 @@ public class TrackerUI : MonoBehaviour {
             }
 
             // Unicast Settings
-            top += 80;
+            top += 60;
             left = Screen.width - 250;
 
-            GUI.Box(new Rect(left, top - 10, 240, 140), "");
+            GUI.Box(new Rect(left, top - 10, 240, 85 + _userTracker.UnicastClients.Length * 30), "");
             left += 10;
 
             GUI.Label(new Rect(left, top, 200, 25), "Unicast Settings:", _titleStyle);
@@ -208,12 +208,13 @@ public class TrackerUI : MonoBehaviour {
                 newUnicastPort = "";
             }
 
+            top += 5;
             left = Screen.width - 250 + 20;
             foreach(string ip in _userTracker.UnicastClients)
             {
                 top += 30;
-                GUI.Label(new Rect(left, top, 160, 25), ip);
-                if (GUI.Button(new Rect(left, top, 20, 20), "R"))
+                GUI.Label(new Rect(left, top, 140, 25), ip);
+                if (GUI.Button(new Rect(left + 140 + 5, top, 60, 20), "Remove"))
                 {
                     _userTracker.removeUnicast(ip);
                 }
