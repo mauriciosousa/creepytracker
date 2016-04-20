@@ -60,7 +60,7 @@ public class CommonUtils
         if (go.GetComponent<Renderer>() != null) go.GetComponent<Renderer>().material = mat;
         foreach (Transform child in go.transform)
         {
-            if (child.gameObject.GetComponent<Renderer>() != null) child.gameObject.GetComponent<Renderer>().material = mat;
+            if (child.gameObject.GetComponent<Renderer>() != null && child.gameObject.tag != "nocolor") child.gameObject.GetComponent<Renderer>().material = mat;
         }
     }
 

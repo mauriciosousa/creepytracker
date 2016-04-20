@@ -44,6 +44,8 @@ public class Tracker : MonoBehaviour {
 
     private UdpBroadcast _udpBroadcast;
 
+    public Material WhiteMaterial;
+
     public string[] UnicastClients
     {
         get
@@ -53,6 +55,8 @@ public class Tracker : MonoBehaviour {
     }
 
     public int showHumanBodies = -1;
+
+    public bool colorHumans;
 
     void Start ()
     {
@@ -66,12 +70,17 @@ public class Tracker : MonoBehaviour {
 
         _loadConfig();
         _loadSavedSensors();
-        
     }
 
     void Update ()
     {
-        foreach(Sensor s in _sensors.Values)
+
+        if (Input.GetKeyDown(KeyCode.C))
+            colorHumans = !colorHumans;
+
+
+
+        foreach (Sensor s in _sensors.Values)
         {
             s.updateBodies();
         }
@@ -131,7 +140,8 @@ public class Tracker : MonoBehaviour {
 
         foreach (Human h in _humans.Values)
         {
-            if (h.seenBySensor != null) CommonUtils.changeGameObjectMaterial(h.gameObject, Sensors[h.seenBySensor].Material);
+            if (h.seenBySensor != null && colorHumans) CommonUtils.changeGameObjectMaterial(h.gameObject, Sensors[h.seenBySensor].Material);
+            else if(!colorHumans) CommonUtils.changeGameObjectMaterial(h.gameObject, WhiteMaterial);
         }
 
         // show / hide human bodies
@@ -476,7 +486,8 @@ public class Tracker : MonoBehaviour {
         // save properties
         ConfigProperties.save(filePath, "udp.listenport", "" + TrackerProperties.Instance.listenPort);
         ConfigProperties.save(filePath, "udp.broadcastport", "" + TrackerProperties.Instance.broadcastPort);
-
+        ConfigProperties.save(filePath, "tracker.mergedistance", "" + TrackerProperties.Instance.mergeDistance);
+        ConfigProperties.save(filePath, "tracker.confidencethreshold", "" + TrackerProperties.Instance.confidenceTreshold);
 
 
         // save sensors
@@ -508,6 +519,18 @@ public class Tracker : MonoBehaviour {
             TrackerProperties.Instance.broadcastPort = int.Parse(port);
         }
         resetBroadcast();
+
+        string aux = ConfigProperties.load(filePath, "tracker.mergedistance");
+        if (aux != "")
+        {
+            TrackerProperties.Instance.mergeDistance = float.Parse(aux);
+        }
+
+        aux = ConfigProperties.load(filePath, "tracker.confidencethreshold");
+        if (aux != "")
+        {
+            TrackerProperties.Instance.confidenceTreshold = int.Parse(aux);
+        }
     }
 
     private void _loadSavedSensors()
