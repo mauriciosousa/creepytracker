@@ -48,8 +48,15 @@ public class UdpListener : MonoBehaviour {
             string stringToParse = _stringsToParse.First();
             _stringsToParse.RemoveAt(0);
 
-            BodiesMessage b = new BodiesMessage(stringToParse);
-            gameObject.GetComponent<Tracker>().setNewFrame(b);
+            try
+            {
+                BodiesMessage b = new BodiesMessage(stringToParse);
+                gameObject.GetComponent<Tracker>().setNewFrame(b);
+            }
+            catch (BodiesMessageException e)
+            {
+                Debug.Log(e.Message);
+            }
         }
     }
 

@@ -130,7 +130,14 @@ public class RPCServer : MonoBehaviour {
     [RPC]
     public void newFrameFromSensor(string bodies)
     {
-        BodiesMessage b = new BodiesMessage(bodies);
-        trackerGameObject.GetComponent<Tracker>().setNewFrame(b);
+        try
+        {
+            BodiesMessage b = new BodiesMessage(bodies);
+            trackerGameObject.GetComponent<Tracker>().setNewFrame(b);
+        }
+        catch (BodiesMessageException e)
+        {
+            Debug.Log(e.Message);
+        }
     }
 }

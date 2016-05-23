@@ -101,6 +101,12 @@ public class Skeleton
     }
 }
 
+public class BodiesMessageException : Exception
+{
+    public BodiesMessageException(string message)
+        : base(message) { }
+}
+
 public class BodiesMessage
 {
     public string Message { get; internal set; }
@@ -120,13 +126,20 @@ public class BodiesMessage
         _start();
         Message = bodies;
 
-        List<string> pdu = new List<string>(bodies.Split(MessageSeparators.L1));
-        KinectId = pdu[0];
-        pdu.RemoveAt(0);
-
-        foreach (string b in pdu)
+        try
         {
-            if (b != "None") _bodies.Add(new Skeleton(b));
+            List<string> pdu = new List<string>(bodies.Split(MessageSeparators.L1));
+            KinectId = pdu[0];
+            pdu.RemoveAt(0);
+
+            foreach (string b in pdu)
+            {
+                if (b != "None") _bodies.Add(new Skeleton(b));
+            }
+        }
+        catch (Exception e)
+        {
+            throw new BodiesMessageException("Cannot instantiate BodiesMessage");
         }
     }
 
