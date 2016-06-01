@@ -488,7 +488,8 @@ public class Tracker : MonoBehaviour {
         ConfigProperties.save(filePath, "udp.broadcastport", "" + TrackerProperties.Instance.broadcastPort);
         ConfigProperties.save(filePath, "tracker.mergedistance", "" + TrackerProperties.Instance.mergeDistance);
         ConfigProperties.save(filePath, "tracker.confidencethreshold", "" + TrackerProperties.Instance.confidenceTreshold);
-
+		ConfigProperties.save(filePath, "udp.sendinterval", "" + TrackerProperties.Instance.sendInterval);
+		ConfigProperties.save(filePath, "tracker.filtergain", "" + KalmanFilterFloat.Gain);
 
         // save sensors
         foreach (Sensor s in _sensors.Values)
@@ -531,6 +532,18 @@ public class Tracker : MonoBehaviour {
         {
             TrackerProperties.Instance.confidenceTreshold = int.Parse(aux);
         }
+
+		aux = ConfigProperties.load(filePath, "udp.sendinternal");
+		if (aux != "")
+		{
+			TrackerProperties.Instance.confidenceTreshold = int.Parse(aux);
+		}
+
+		aux = ConfigProperties.load(filePath, "tracker.filtergain");
+		if (aux != "")
+		{
+			KalmanFilterFloat.Gain = float.Parse(aux);
+		}
     }
 
     private void _loadSavedSensors()

@@ -8,6 +8,7 @@ public class TrackerProperties : MonoBehaviour {
 
     public int listenPort = 57743;
     public int broadcastPort = 53804;
+	public int sendInterval = 50;
 
     [Range(0, 1)]
     public float mergeDistance = 0.3f;
