@@ -12,7 +12,6 @@ public class UdpBroadcast
 	
 	private IPEndPoint _remoteEndPoint;
 	private UdpClient _udp;
-	private int _sendRate;
 
 	private DateTime _lastSent;
 
@@ -36,7 +35,6 @@ public class UdpBroadcast
 
 	public void reset(int port, int sendRate = 100)
 	{
-		_sendRate = sendRate;
 		try
 		{
 			_port = port;
@@ -60,14 +58,14 @@ public class UdpBroadcast
 		{
 			try
 			{
-				if (DateTime.Now > _lastSent)
+				if (DateTime.Now > _lastSent.AddMilliseconds(TrackerProperties.Instance.sendInterval))
 				{
 					byte[] data = Encoding.UTF8.GetBytes(line);
 
 					_udp.Send(data, data.Length, _remoteEndPoint);
 
-                    foreach (IPEndPoint ip in _unicastClients.Values)
-                        _udp.Send(data, data.Length, ip);
+                    //foreach (IPEndPoint ip in _unicastClients.Values)
+                    //    _udp.Send(data, data.Length, ip);
 
                     _lastSent = DateTime.Now;
 				}
