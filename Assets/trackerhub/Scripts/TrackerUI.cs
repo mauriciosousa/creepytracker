@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 enum MenuAction
 {
@@ -7,6 +8,7 @@ enum MenuAction
     Sensors,
     Humans,
     Devices,
+	Clouds,
     NetworkSettings,
     About,
     None
@@ -29,6 +31,10 @@ public class TrackerUI : MonoBehaviour {
     public Texture aboutOn;
     public Texture aboutOff;
 
+	public Texture cloudTextureOn;
+	public Texture cloudTextureOff;
+
+	public Texture nextTexture;
     [Range(20, 100)]
     public int iconSize;
 
@@ -38,7 +44,10 @@ public class TrackerUI : MonoBehaviour {
 
 	private GUIStyle _titleStyle;
 
+	private int _currentCloudSensor;
 
+	public float _rotStep = 2f;
+	public float _transStep = 0.02f;
     private string newUnicastAddress;
     private string newUnicastPort;
 
@@ -46,7 +55,7 @@ public class TrackerUI : MonoBehaviour {
     {
         _userTracker = gameObject.GetComponent<Tracker>();
         _menuAction = MenuAction.None;
-
+		_currentCloudSensor = 0;
 		_titleStyle = new GUIStyle ();
 		_titleStyle.fontStyle = FontStyle.Bold;
 		_titleStyle.normal.textColor = Color.white;
@@ -72,9 +81,9 @@ public class TrackerUI : MonoBehaviour {
         //left += iconSize + iconSize / 2;
         displayMenuButton(MenuAction.Settings, settingsTextureOn, settingsTextureOff, new Rect(left, top, iconSize, iconSize));
 
-        
+        left += iconSize + iconSize / 2;
 
-
+		displayMenuButton(MenuAction.Clouds, cloudTextureOn, cloudTextureOff, new Rect(left, top, iconSize, iconSize));
 
         left = Screen.width - iconSize - 10;
         displayMenuButton(MenuAction.NetworkSettings, networkTextureOn, networkTextureOff, new Rect(left, top, iconSize, iconSize));
@@ -142,6 +151,95 @@ public class TrackerUI : MonoBehaviour {
 
 
         }
+
+		if (_menuAction == MenuAction.Clouds) {
+			top = iconSize + iconSize / 2;
+			left = 20 + 3*iconSize;
+			
+			GUI.Box(new Rect(left - 10, top - 10, 225, _userTracker.Sensors.Count == 0 ? 45 : (30 * 4 + 80 + 5)), "");
+			
+			float t = Time.deltaTime;
+			if (_userTracker.Sensors.Count > 0)
+			{
+
+				if(GUI.Button(new Rect(left,top,60,20),"Request")){
+					_userTracker.broadCastCloudRequests();
+				}
+				if(GUI.Button(new Rect(left+70,top,60,20),"Hide")){
+					_userTracker.hideAllClouds();
+				}
+				if(GUI.Button(new Rect(left+140,top,60,20),"Save")){
+					_userTracker.Save();
+				}
+				top+=45;
+
+				List<string> keyList = new List<string>(_userTracker.Sensors.Keys);
+				GUI.Label(new Rect(left, top, 1000, 40),keyList[_currentCloudSensor]);
+				if(GUI.Button(new Rect(left+155, top+2, 25, 25),nextTexture)){
+					_currentCloudSensor = (_currentCloudSensor+1)%_userTracker.Sensors.Count;
+				}
+				string sid= keyList[_currentCloudSensor];
+				GameObject s = _userTracker.Sensors[sid].SensorGameObject;
+				Vector3 rotation = s.transform.rotation.eulerAngles;
+				Vector3 position = s.transform.position;
+				string rx = rotation.x.ToString(); string ry = rotation.y.ToString(); string rz = rotation.z.ToString();
+				string px = position.x.ToString(); string py = position.y.ToString(); string pz = position.z.ToString();
+
+				top+=30;
+				GUI.Label(new Rect(left+2,top,100,40),"Rotation");
+				GUI.Label(new Rect(left+112,top,100,40),"Translation");
+				top+=30;
+				GUI.Label(new Rect(left+2,top,100,40),"x:");
+				GUI.TextField(new Rect(left+37,top+2,40,20),rx);
+				GUI.Label(new Rect(left+112,top,100,40),"x:");
+				GUI.TextField(new Rect(left+147,top+2,40,20),px);
+				
+				if(GUI.RepeatButton(new Rect(left+15,top+2,20,20),"<")) rotation.x = rotation.x-_rotStep*t;
+				if(GUI.RepeatButton(new Rect(left+79,top+2,20,20),">"))rotation.x = rotation.x+_rotStep*t;
+				if(GUI.RepeatButton(new Rect(left+125,top+2,20,20),"<")) position.x = position.x-_transStep*t;
+				if(GUI.RepeatButton(new Rect(left+189,top+2,20,20),">"))position.x = position.x+_transStep*t;
+				top+=30;
+				GUI.Label(new Rect(left+2,top,100,40),"y:");
+				GUI.TextField(new Rect(left+37,top+2,40,20),ry);
+				GUI.Label(new Rect(left+112,top,100,40),"y:");
+				GUI.TextField(new Rect(left+147,top+2,40,20),py);
+				
+				if(GUI.RepeatButton(new Rect(left+15,top+2,20,20),"<")) rotation.y = rotation.y-_rotStep*t;
+				if(GUI.RepeatButton(new Rect(left+79,top+2,20,20),">"))rotation.y = rotation.y+_rotStep*t;
+				if(GUI.RepeatButton(new Rect(left+125,top+2,20,20),"<")) position.y = position.y-_transStep*t;
+				if(GUI.RepeatButton(new Rect(left+189,top+2,20,20),">"))position.y = position.y+_transStep*t;
+
+
+				top+=30;
+				GUI.Label(new Rect(left+2,top,100,40),"z:");
+				GUI.TextField(new Rect(left+37,top+2,40,20),rz);
+				GUI.Label(new Rect(left+112,top,100,40),"z:");
+				GUI.TextField(new Rect(left+147,top+2,40,20),pz);
+				
+				if(GUI.RepeatButton(new Rect(left+15,top+2,20,20),"<")) rotation.z = rotation.z-_rotStep*t;
+				if(GUI.RepeatButton(new Rect(left+79,top+2,20,20),">"))rotation.z = rotation.z+_rotStep*t;
+				if(GUI.RepeatButton(new Rect(left+125,top+2,20,20),"<")) position.z = position.z-_transStep*t;
+				if(GUI.RepeatButton(new Rect(left+189,top+2,20,20),">"))position.z = position.z+_transStep*t;
+
+				float x,y,z;
+				float xr,yr,zr;
+				if(position == s.transform.position && float.TryParse(px,out x) && float.TryParse(py,out y) && float.TryParse(pz, out z)){
+					s.transform.position = new Vector3(x,y,z);
+				}else{
+					s.transform.position = position;
+				}
+				if(rotation == s.transform.rotation.eulerAngles && float.TryParse(rx,out xr) && float.TryParse(ry,out yr) && float.TryParse(rz,out zr)){
+					s.transform.rotation = Quaternion.Euler(xr,yr,zr);
+				}else{
+					s.transform.rotation = Quaternion.Euler(rotation);
+				}
+
+			}
+			else
+			{
+				GUI.Label(new Rect(left, top, 1000, 40), "No connected sensors.");
+			}
+		}
 
         if (_menuAction == MenuAction.NetworkSettings)
         {

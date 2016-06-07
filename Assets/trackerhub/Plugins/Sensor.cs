@@ -10,6 +10,7 @@ public class Sensor
 
     public Dictionary<string, SensorBody> bodies;
 
+	public PointCloudSimple lastCloud;
     private GameObject _sensorGameObject;
     public GameObject SensorGameObject { get { return _sensorGameObject; } }
 
@@ -80,13 +81,24 @@ public class Sensor
 
         _material = _chooseMaterial();
         CommonUtils.changeGameObjectMaterial(_sensorGameObject, _material);
-
+		GameObject cloudobj = new GameObject("PointCloud");
+		cloudobj.transform.parent = sensorGameObject.transform;
+		cloudobj.transform.localPosition = Vector3.zero;
+		cloudobj.transform.localRotation = Quaternion.identity;
+		cloudobj.transform.localScale = new Vector3 (-1, 1, 1);
+		cloudobj.AddComponent<PointCloudSimple> ();
+		lastCloud =  cloudobj.GetComponent<PointCloudSimple>();
     }
 
     internal Vector3 pointSensorToScene(Vector3 p)
     {
         return SensorGameObject.transform.localToWorldMatrix.MultiplyPoint(p);
     }
+
+	internal void updateCloud(CloudMessage cl){
+		lastCloud.setPoints (cl.Points,cl.id);
+		lastCloud.setToView ();
+	}
 
     internal void updateBodies()
     {

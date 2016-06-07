@@ -4,6 +4,9 @@ using System.Collections;
 using System;
 using System.Linq;
 using Windows.Kinect;
+using System.Net.Sockets;
+using System.Net;
+using System.Text;
 
 public enum CalibrationProcess
 {
@@ -77,8 +80,6 @@ public class Tracker : MonoBehaviour {
 
         if (Input.GetKeyDown(KeyCode.C))
             colorHumans = !colorHumans;
-
-
 
         foreach (Sensor s in _sensors.Values)
         {
@@ -350,6 +351,18 @@ public class Tracker : MonoBehaviour {
         _udpBroadcast.removeUnicast(key);
     }
 
+	internal void setNewCloud(CloudMessage cloud)
+	{
+		if (!Sensors.ContainsKey(cloud.KinectId))
+		{
+			Vector3 position = new Vector3(Mathf.Ceil(Sensors.Count / 2.0f) * (Sensors.Count % 2 == 0 ? -1.0f : 1.0f), 1, 0);
+			
+			Sensors[cloud.KinectId] = new Sensor(cloud.KinectId, (GameObject) Instantiate(Resources.Load("Prefabs/KinectSensorPrefab"), position, Quaternion.identity));
+		}
+		
+		Sensors [cloud.KinectId].updateCloud (cloud);
+	}
+
     internal void setNewFrame(BodiesMessage bodies)
     {
         if (!Sensors.ContainsKey(bodies.KinectId))
@@ -583,4 +596,19 @@ public class Tracker : MonoBehaviour {
     {
         _saveConfig();
     }
+
+	public void hideAllClouds(){
+		foreach (Sensor s in _sensors.Values) {
+			s.lastCloud.hideFromView();
+		}
+	}
+
+	public void broadCastCloudRequests(){
+		UdpClient udp = new UdpClient ();
+		string message = CloudMessage.createRequestMessage (); 
+		byte[] data = Encoding.UTF8.GetBytes(message);
+		IPEndPoint remoteEndPoint = new IPEndPoint(IPAddress.Broadcast, TrackerProperties.Instance.listenPort + 1);
+		udp.Send(data, data.Length, remoteEndPoint);
+	}
+
 }

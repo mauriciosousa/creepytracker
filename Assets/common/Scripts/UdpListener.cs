@@ -36,9 +36,9 @@ public class UdpListener : MonoBehaviour {
     public void ReceiveCallback(IAsyncResult ar)
     {
         Byte[] receiveBytes = _udpClient.EndReceive(ar, ref _anyIP);
-        _stringsToParse.Add(Encoding.ASCII.GetString(receiveBytes));
+		_stringsToParse.Add(Encoding.ASCII.GetString(receiveBytes));
 
-        _udpClient.BeginReceive(new AsyncCallback(this.ReceiveCallback), null);
+		_udpClient.BeginReceive(new AsyncCallback(this.ReceiveCallback), null);
     }
 
     void Update()
@@ -47,16 +47,24 @@ public class UdpListener : MonoBehaviour {
         {
             string stringToParse = _stringsToParse.First();
             _stringsToParse.RemoveAt(0);
+			if(stringToParse != null){
+				string[] splitmsg = stringToParse.Split (MessageSeparators.L0);
+				if(splitmsg[0] == "BodiesMessage"){
+					try
+            		{
+						BodiesMessage b = new BodiesMessage(splitmsg[1]);
+						gameObject.GetComponent<Tracker>().setNewFrame(b);
+					}catch (BodiesMessageException e)
+            		{
+                		Debug.Log(e.Message);
+            		}
+				}
+				if (splitmsg [0] == "CloudMessage") {
+					CloudMessage c = new CloudMessage(splitmsg[1]);
+					gameObject.GetComponent<Tracker>().setNewCloud(c);
 
-            try
-            {
-                BodiesMessage b = new BodiesMessage(stringToParse);
-                gameObject.GetComponent<Tracker>().setNewFrame(b);
-            }
-            catch (BodiesMessageException e)
-            {
-                Debug.Log(e.Message);
-            }
+				}
+			}
         }
     }
 
