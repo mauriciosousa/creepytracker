@@ -54,6 +54,7 @@ public class TrackerUI : MonoBehaviour
 
 	private string newUnicastAddress;
 	private string newUnicastPort;
+	private bool _continuous;
 
 	void Start ()
 	{
@@ -63,7 +64,7 @@ public class TrackerUI : MonoBehaviour
 		_titleStyle = new GUIStyle ();
 		_titleStyle.fontStyle = FontStyle.Bold;
 		_titleStyle.normal.textColor = Color.white;
-
+		_continuous = false;
 		newUnicastAddress = "";
 		newUnicastPort = "";
 
@@ -171,8 +172,9 @@ public class TrackerUI : MonoBehaviour
 			if (_userTracker.Sensors.Count > 0) {
 
 				if (GUI.Button (new Rect (left, top, 60, 20), "Request")) {
-					_userTracker.broadCastCloudRequests ();
+					_userTracker.broadCastCloudRequests(_continuous);
 				}
+				_continuous = GUI.Toggle(new Rect(left,top+20,90,20),_continuous,"Continuous");
 				if (GUI.Button (new Rect (left + 70, top, 60, 20), "Hide")) {
 					_userTracker.hideAllClouds ();
 				}

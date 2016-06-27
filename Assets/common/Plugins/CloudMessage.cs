@@ -30,8 +30,8 @@ public class CloudMessage {
 		}
 	}
 
-	public static string createRequestMessage()
+	public static string createRequestMessage(int mode)
 	{
-		return "CloudMessage" + MessageSeparators.L0 + Network.player.ipAddress + MessageSeparators.L1 + TrackerProperties.Instance.listenPort;
+		return "CloudMessage" + MessageSeparators.L0 + Network.player.ipAddress + MessageSeparators.L1 + (mode) + MessageSeparators.L1 + TrackerProperties.Instance.listenPort;
 	}
 }

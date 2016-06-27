@@ -22,23 +22,32 @@ public class Tracker : MonoBehaviour
 
 	private Dictionary<string, Sensor> _sensors;
 
-	public Dictionary<string, Sensor> Sensors {
-		get {
+	public Dictionary<string, Sensor> Sensors
+	{
+		get 
+		{
 			return _sensors;
 		}
 	}
+	
+
 
 	private CalibrationProcess _calibrationStatus;
-
-	public CalibrationProcess CalibrationStatus {
-		get {
+	public CalibrationProcess CalibrationStatus 
+{
+		get 
+		{
 			return _calibrationStatus;
 		}
 
-		set {
+		set 
+		{
 			_calibrationStatus = value;
 		}
 	}
+
+
+
 
 	private Dictionary<int, Human> _humans;
 
@@ -560,12 +569,16 @@ public class Tracker : MonoBehaviour
 		foreach (Sensor s in _sensors.Values) {
 			s.lastCloud.hideFromView ();
 		}
+		UdpClient udp = new UdpClient ();
+		string message = CloudMessage.createRequestMessage (2); 
+		byte[] data = Encoding.UTF8.GetBytes(message);
+		IPEndPoint remoteEndPoint = new IPEndPoint(IPAddress.Broadcast, TrackerProperties.Instance.listenPort + 1);
+		udp.Send(data, data.Length, remoteEndPoint);
 	}
 
-	public void broadCastCloudRequests ()
-	{
+	public void broadCastCloudRequests(bool continuous){
 		UdpClient udp = new UdpClient ();
-		string message = CloudMessage.createRequestMessage (); 
+		string message = CloudMessage.createRequestMessage (continuous?1:0); 
 		byte[] data = Encoding.UTF8.GetBytes (message);
 		IPEndPoint remoteEndPoint = new IPEndPoint (IPAddress.Broadcast, TrackerProperties.Instance.listenPort + 1);
 		udp.Send (data, data.Length, remoteEndPoint);
