@@ -55,6 +55,6 @@ public class Human
 
     internal string getPDU()
     {
-        return Skeleton.getPDU();
+        return "Sensor" + MessageSeparators.SET + seenBySensor + MessageSeparators.L2 + Skeleton.getPDU();
     }
 }

@@ -69,7 +69,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\common\Plugins\AdaptiveDoubleExponentialFilterFloat.cs" />
+    <Compile Include="Assets\common\Plugins\AdaptiveDoubleExponentialFilterVector3.cs" />
     <Compile Include="Assets\common\Plugins\BodiesMessage.cs" />
+    <Compile Include="Assets\common\Plugins\CloudMessage.cs" />
     <Compile Include="Assets\common\Plugins\CommonUtils.cs" />
     <Compile Include="Assets\common\Plugins\ConfigProperties.cs" />
     <Compile Include="Assets\common\Plugins\KalmanFilterFloat.cs" />
@@ -79,6 +82,7 @@
     <Compile Include="Assets\common\Scripts\DoNotify.cs" />
     <Compile Include="Assets\common\Scripts\GridOverlay.cs" />
     <Compile Include="Assets\common\Scripts\Logger.cs" />
+    <Compile Include="Assets\common\Scripts\PointCloudSimple.cs" />
     <Compile Include="Assets\common\Scripts\UdpListener.cs" />
     <Compile Include="Assets\trackerhub\Plugins\Human.cs" />
     <Compile Include="Assets\trackerhub\Plugins\Sensor.cs" />
@@ -90,6 +94,8 @@
     <Compile Include="Assets\trackerhub\Scripts\TrackerUI.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\Shaders\GS Billboard.shader" />
+    <None Include="Assets\Shaders\VertexColor.shader" />
     <None Include="Assets\common\Models\Shaders\Skybox-Procedural.shader" />
     <None Include="Assets\common\Shaders\Grid.shader" />
     <None Include="Assets\configSettings.txt" />
