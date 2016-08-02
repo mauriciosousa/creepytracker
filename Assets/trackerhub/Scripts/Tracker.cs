@@ -516,7 +516,7 @@ public class Tracker : MonoBehaviour
 			TrackerProperties.Instance.confidenceTreshold = int.Parse (aux);
 		}
 
-		aux = ConfigProperties.load (filePath, "udp.sendinternal");
+		aux = ConfigProperties.load (filePath, "udp.sendinterval");
 		if (aux != "") {
 			TrackerProperties.Instance.confidenceTreshold = int.Parse (aux);
 		}
