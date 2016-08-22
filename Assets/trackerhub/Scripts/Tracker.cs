@@ -22,26 +22,22 @@ public class Tracker : MonoBehaviour
 
 	private Dictionary<string, Sensor> _sensors;
 
-	public Dictionary<string, Sensor> Sensors
-	{
-		get 
-		{
+	public Dictionary<string, Sensor> Sensors {
+		get {
 			return _sensors;
 		}
 	}
-	
+
 
 
 	private CalibrationProcess _calibrationStatus;
-	public CalibrationProcess CalibrationStatus 
-{
-		get 
-		{
+
+	public CalibrationProcess CalibrationStatus {
+		get {
 			return _calibrationStatus;
 		}
 
-		set 
-		{
+		set {
 			_calibrationStatus = value;
 		}
 	}
@@ -82,7 +78,7 @@ public class Tracker : MonoBehaviour
 		_loadSavedSensors ();
 	}
 
-	void Update ()
+	void FixedUpdate ()
 	{
 
 		if (Input.GetKeyDown (KeyCode.C))
@@ -416,11 +412,13 @@ public class Tracker : MonoBehaviour
 		n.notifySend (NotificationLevel.INFO, "Calibration complete", "Config file updated", 5000);
 	}
 
-	internal Vector3 getJointPosition (int id, JointType joint)
+	internal Vector3 getJointPosition (int id, JointType joint, Vector3 garbage)
 	{
 		Human h = _humans [id];
 		SensorBody bestBody = h.bodies [0];
 		int confidence = bestBody.Confidence;
+		int lastSensorConfidence = 0;
+		SensorBody lastSensorBody = null;
 
 		foreach (SensorBody b in h.bodies) {
 			int bConfidence = b.Confidence;
@@ -428,9 +426,17 @@ public class Tracker : MonoBehaviour
 				confidence = bConfidence;
 				bestBody = b;
 			}
+
+			if (b.sensorID == h.seenBySensor) {
+				lastSensorConfidence = bConfidence;
+				lastSensorBody = b;
+			}
 		}
 
-		h.seenBySensor = bestBody.sensorID;
+		if (lastSensorBody == null || (bestBody.sensorID != h.seenBySensor && confidence > (lastSensorConfidence + 1)))
+			h.seenBySensor = bestBody.sensorID;
+		else
+			bestBody = lastSensorBody;
 
 		return _sensors [bestBody.sensorID].pointSensorToScene (CommonUtils.pointKinectToUnity (bestBody.skeleton.jointsPositions [joint]));
 	}
@@ -518,7 +524,7 @@ public class Tracker : MonoBehaviour
 
 		aux = ConfigProperties.load (filePath, "udp.sendinterval");
 		if (aux != "") {
-			TrackerProperties.Instance.confidenceTreshold = int.Parse (aux);
+			TrackerProperties.Instance.sendInterval = int.Parse (aux);
 		}
 
 		/*aux = ConfigProperties.load (filePath, "tracker.filtergain");
@@ -571,14 +577,15 @@ public class Tracker : MonoBehaviour
 		}
 		UdpClient udp = new UdpClient ();
 		string message = CloudMessage.createRequestMessage (2); 
-		byte[] data = Encoding.UTF8.GetBytes(message);
-		IPEndPoint remoteEndPoint = new IPEndPoint(IPAddress.Broadcast, TrackerProperties.Instance.listenPort + 1);
-		udp.Send(data, data.Length, remoteEndPoint);
+		byte[] data = Encoding.UTF8.GetBytes (message);
+		IPEndPoint remoteEndPoint = new IPEndPoint (IPAddress.Broadcast, TrackerProperties.Instance.listenPort + 1);
+		udp.Send (data, data.Length, remoteEndPoint);
 	}
 
-	public void broadCastCloudRequests(bool continuous){
+	public void broadCastCloudRequests (bool continuous)
+	{
 		UdpClient udp = new UdpClient ();
-		string message = CloudMessage.createRequestMessage (continuous?1:0); 
+		string message = CloudMessage.createRequestMessage (continuous ? 1 : 0); 
 		byte[] data = Encoding.UTF8.GetBytes (message);
 		IPEndPoint remoteEndPoint = new IPEndPoint (IPAddress.Broadcast, TrackerProperties.Instance.listenPort + 1);
 		udp.Send (data, data.Length, remoteEndPoint);
