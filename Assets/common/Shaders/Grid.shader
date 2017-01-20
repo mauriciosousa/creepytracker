@@ -1,3 +1,5 @@
+// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
+
 Shader "Custom/Grid" {
  
      Properties {
@@ -50,7 +52,7 @@ Shader "Custom/Grid" {
            vertexOutput output;
            output.pos = mul(UNITY_MATRIX_MVP, input.vertex);
            // Calculate the world position coordinates to pass to the fragment shader
-           output.worldPos = mul(_Object2World, input.vertex);
+           output.worldPos = mul(unity_ObjectToWorld, input.vertex);
            return output;
          }
          // FRAGMENT SHADER

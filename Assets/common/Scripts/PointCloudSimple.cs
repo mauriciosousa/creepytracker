@@ -22,6 +22,58 @@ public class PointCloudSimple : MonoBehaviour {
     List <Point3DRGB> highres_points;
     List<Point3DRGB> lowres_points;
 
+
+    //just debug
+    public string cloudPath = "";
+    bool cloudLoaded = false;
+
+    void readFileWithColor(string f)
+    {
+        FileStream fs = new FileStream(f, FileMode.Open);
+        StreamReader sr = new StreamReader(fs);
+
+        List<Point3DRGB> highres = new List<Point3DRGB>();
+
+        string line = "";
+        int i = 0;
+        Mesh m = new Mesh();
+        while (!sr.EndOfStream)
+        {
+            line = sr.ReadLine();
+            line = line.Replace(",", ".");
+            char[] sep = { ' ' };
+            string[] lin = line.Split(sep);
+          
+            float x = float.Parse(lin[0]);
+            float y = float.Parse(lin[1]);
+            float z = float.Parse(lin[2]);
+
+            bool use = false;
+            Color c = new Color();
+            
+            c.r = int.Parse(lin[5]) / 255.0f;
+            c.g = int.Parse(lin[4]) / 255.0f;
+            c.b = int.Parse(lin[3]) / 255.0f;
+            highres.Add(new Point3DRGB(new Vector3(x, y, z), c));
+
+        }
+        setPoints(highres, new List<Point3DRGB>(), ++id);
+        Debug.Log("number of points " + highres.Count);
+        setToView();
+    }
+    
+    ///////////////////////////////////////////////////////
+
+    void Update()
+    {
+        if (!cloudLoaded && cloudPath != "")
+        {
+            readFileWithColor(cloudPath);
+            Debug.Log("Loaded");
+            cloudLoaded = true;
+        }
+    }
+
     public void setPoints(List<Point3DRGB> highres, List<Point3DRGB> lowres, int newid){
 		if (newid != id) {
             highres_points.Clear();

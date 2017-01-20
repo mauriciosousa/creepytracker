@@ -586,7 +586,7 @@ public class Tracker : MonoBehaviour
 			s.lastCloud.hideFromView ();
 		}
 		UdpClient udp = new UdpClient ();
-		string message = CloudMessage.createRequestMessage (2); 
+		string message = CloudMessage.createRequestMessage (2,Network.player.ipAddress, TrackerProperties.Instance.listenPort); 
 		byte[] data = Encoding.UTF8.GetBytes(message);
 		IPEndPoint remoteEndPoint = new IPEndPoint(IPAddress.Broadcast, TrackerProperties.Instance.listenPort + 1);
 		udp.Send(data, data.Length, remoteEndPoint);
@@ -595,10 +595,27 @@ public class Tracker : MonoBehaviour
 	public void broadCastCloudRequests (bool continuous)
 	{
 		UdpClient udp = new UdpClient ();
-		string message = CloudMessage.createRequestMessage (continuous ? 1 : 0); 
+		string message = CloudMessage.createRequestMessage (continuous ? 1 : 0, Network.player.ipAddress, TrackerProperties.Instance.listenPort); 
 		byte[] data = Encoding.UTF8.GetBytes (message);
 		IPEndPoint remoteEndPoint = new IPEndPoint (IPAddress.Broadcast, TrackerProperties.Instance.listenPort + 1);
 		udp.Send (data, data.Length, remoteEndPoint);
 	}
+
+    public void processAvatarMessage(AvatarMessage av)
+    {
+        UdpClient udp = new UdpClient();
+        //Calibration
+        string message = av.createCalibrationMessage(_sensors);
+        byte[] data = Encoding.UTF8.GetBytes(message);
+        IPEndPoint remoteEndPoint = new IPEndPoint(av.replyIPAddress, av.port);
+        Debug.Log("Sent reply with calibration data " + message);
+        udp.Send(data, data.Length, remoteEndPoint);
+        //broadcast
+        string message2 = CloudMessage.createRequestMessage(av.mode, av.replyIPAddress.ToString(), av.port);
+        byte[] data2 = Encoding.UTF8.GetBytes(message2);
+        IPEndPoint remoteEndPoint2 = new IPEndPoint(IPAddress.Broadcast, TrackerProperties.Instance.listenPort + 1);
+        udp.Send(data2, data2.Length, remoteEndPoint2);
+        Debug.Log("Forwarded request to clients " + message2);
+    }
 
 }

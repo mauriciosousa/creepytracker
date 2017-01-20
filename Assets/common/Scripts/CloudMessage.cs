@@ -9,9 +9,9 @@ public class CloudMessage {
     public List<Point3DRGB> Points_highres { get; internal set; }
     public string KinectId { get; internal set; }
 	public int id;
-	public CloudMessage(string message, byte[] receivedBytes)
+	public CloudMessage(string message, byte[] receivedBytes, int headerSize)
 	{
-        int step = 15; // TMA: Size in bytes of heading: "CloudMessage" + L0 + 2 * L1. Check the UDPListener.cs from the Client.
+        int step = headerSize+3; // TMA: Size in bytes of heading: "CloudMessage" + L0 + 2 * L1. Check the UDPListener.cs from the Client.
         byte[] buffer = new byte[4]; // Buffer for the x, y and z floats
 		string[] pdu = message.Split(MessageSeparators.L1);
         float x, y, z;
@@ -62,8 +62,8 @@ public class CloudMessage {
         }
     }
 
-	public static string createRequestMessage(int mode)
+	public static string createRequestMessage(int mode,string addr,int port)
 	{
-		return "CloudMessage" + MessageSeparators.L0 + Network.player.ipAddress + MessageSeparators.L1 + (mode) + MessageSeparators.L1 + TrackerProperties.Instance.listenPort;
+		return "CloudMessage" + MessageSeparators.L0 + addr + MessageSeparators.L1 + (mode) + MessageSeparators.L1 + port;
 	}
 }
