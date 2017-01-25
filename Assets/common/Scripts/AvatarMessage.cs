@@ -25,7 +25,7 @@ public class AvatarMessage {
             if (!first) res += MessageSeparators.L1;
             Vector3 p = s.SensorGameObject.transform.position;
             Quaternion r = s.SensorGameObject.transform.rotation;
-            res += s.SensorID + ";" + p.x + ";" + p.y + ";" + p.z + ";" + r.x + ";" + r.y + ";" + r.z + ";" + r.w;
+            res += s.SensorID + ";" + p.x + ";" + p.y + ";" + p.z + ";" + r.x + ";" + r.y + ";" + r.z + ";" + r.w + MessageSeparators.L1;
         }
         return res;
     }
