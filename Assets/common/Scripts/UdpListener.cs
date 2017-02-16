@@ -13,9 +13,13 @@ public class UdpListener : MonoBehaviour {
     private List<byte[]> _stringsToParse; // TMA: Store the bytes from the socket instead of converting to strings. Saves time.
     private byte[] _receivedBytes;
     private int number = 0;
+    //so we don't have to create again
+    CloudMessage message;
 
     void Start()
-    { }
+    {
+        message = new CloudMessage();
+    }
 
     public void udpRestart()
     {
@@ -38,10 +42,8 @@ public class UdpListener : MonoBehaviour {
     public void ReceiveCallback(IAsyncResult ar)
     {
         Byte[] receiveBytes = _udpClient.EndReceive(ar, ref _anyIP);
-        
-		_stringsToParse.Add(receiveBytes);
-
         _udpClient.BeginReceive(new AsyncCallback(this.ReceiveCallback), null);
+        _stringsToParse.Add(receiveBytes);
     }
 
     void Update()
@@ -71,8 +73,8 @@ public class UdpListener : MonoBehaviour {
                     {
                         string stringToParse = Encoding.ASCII.GetString(toProcess);
                         string[] splitmsg = stringToParse.Split(MessageSeparators.L0);
-                        CloudMessage c = new CloudMessage(splitmsg[1], toProcess, splitmsg[0].Length);
-                        gameObject.GetComponent<Tracker>().setNewCloud(c);
+                        message.set(splitmsg[1], toProcess, splitmsg[0].Length);
+                        gameObject.GetComponent<Tracker>().setNewCloud(message);
                     }
                     else if (Convert.ToChar(toProcess[0]) == 'A')
                     {

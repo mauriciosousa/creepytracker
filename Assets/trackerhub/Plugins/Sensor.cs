@@ -91,11 +91,7 @@ public class Sensor
 		return SensorGameObject.transform.localToWorldMatrix.MultiplyPoint (p);
 	}
 
-	internal void updateCloud (CloudMessage cl)
-	{
-		lastCloud.setPoints (cl.Points_highres, cl.Points_lowres, cl.id);
-        lastCloud.setToView ();
-	}
+	
 
 	internal void updateBodies ()
 	{
