@@ -130,7 +130,7 @@ public class PointCloudSimple : MonoBehaviour
         }
         else
         {
-            Debug.Log("Old packet");
+            Debug.Log("Old packet" + newid);
             return;
         }
 

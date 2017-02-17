@@ -331,17 +331,21 @@ public class Tracker : MonoBehaviour
 	}
 
     //FOR TCP
-    internal void setNewCloud(string KinectID, byte[] data, int size)
+    internal void setNewCloud(string KinectID, byte[] data, int size, uint id)
     {
 
         // tirar o id da mensagem que é um int
+        
         if (Sensors.ContainsKey(KinectID))
         {
-            byte[] idb = { data[0], data[1], data[2], data[3] };
-            uint id = BitConverter.ToUInt32(idb, 0);
-            Sensors[KinectID].lastCloud.setPoints(data, 4, id, size);
+            Sensors[KinectID].lastCloud.setPoints(data, 0, id, size);
             Sensors[KinectID].lastCloud.setToView();
         }
+    }
+
+    internal void setCloudToView(string KinectID)
+    {
+        Sensors[KinectID].lastCloud.setToView();
     }
 
     internal void setNewCloud (CloudMessage cloud)
