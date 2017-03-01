@@ -1,0 +1,11 @@
+% 2017/03/01 15:13:46
+surface.name=DisplayAoLadoDoPires
+surface.kinect=AVESTRUZ
+surface.bottom.left=-0.04591234:0.322477:2.116
+surface.bottom.right=-0.06411292:-0.1963875:2.14
+surface.top.left=0.2422995:0.3146057:2.164395
+surface.top.right=0.2240989:-0.2042588:2.188395
+tracker.surface.bottom.left=0.5147778:1.127509:-0.1570802
+tracker.surface.bottom.right=0.5434445:0.6088215:-0.173481
+tracker.surface.top.left=0.3043689:1.122296:-0.3599865
+tracker.surface.top.right=0.3330356:0.6036085:-0.3763871

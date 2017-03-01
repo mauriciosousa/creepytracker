@@ -313,7 +313,9 @@ public class Tracker : MonoBehaviour
 		}
 	}
 
-	private float calcHorizontalDistance (Vector3 a, Vector3 b)
+
+
+    private float calcHorizontalDistance (Vector3 a, Vector3 b)
 	{
 		Vector3 c = new Vector3 (a.x, 0, a.z);
 		Vector3 d = new Vector3 (b.x, 0, b.z);
@@ -652,4 +654,34 @@ public class Tracker : MonoBehaviour
         Debug.Log("Forwarded request to clients " + message2);
     }
 
+    internal void LoadSurfaces()
+    {
+        Surface [] surfaces = Surface.loadSurfaces("Surfaces");
+        foreach (Surface s in surfaces)
+        {
+            if (_sensors.ContainsKey(s.sensorid))
+            {
+                s.surfaceGO = __createSurfaceGos(s.name, Vector3.zero, _sensors[s.sensorid].SensorGameObject.transform);
+                GameObject bl = __createSurfaceGos("bl", s.BottomLeft, s.surfaceGO.transform);
+                GameObject br = __createSurfaceGos("br", s.BottomRight, s.surfaceGO.transform);
+                GameObject tl = __createSurfaceGos("tl", s.TopLeft, s.surfaceGO.transform);
+                GameObject tr = __createSurfaceGos("tr", s.TopRight, s.surfaceGO.transform);
+
+                gameObject.GetComponent<DoNotify>().notifySend(NotificationLevel.INFO, "New Surface", "Surface " + s.name + " added", 5000);
+
+                s.saveSurface(bl, br, tl, tr);
+
+            }
+        }
+    }
+
+    internal GameObject __createSurfaceGos(string name, Vector3 position, Transform parent)
+    {
+        GameObject g = new GameObject();
+        g.transform.parent = parent;
+        g.transform.localRotation = Quaternion.identity;
+        g.name = name;
+        g.transform.localPosition = position;
+        return g;
+    }
 }
