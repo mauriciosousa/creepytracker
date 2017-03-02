@@ -681,7 +681,7 @@ public class Tracker : MonoBehaviour
         g.transform.parent = parent;
         g.transform.localRotation = Quaternion.identity;
         g.name = name;
-        g.transform.localPosition = position;
+        g.transform.localPosition = CommonUtils.pointKinectToUnity(position); 
         return g;
     }
 }

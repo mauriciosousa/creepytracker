@@ -1,0 +1,11 @@
+% 2017/03/01 18:48:18
+surface.name=BUBU
+surface.kinect=AVESTRUZ
+surface.bottom.left=-0.4231551:-0.3923729:1.508
+surface.bottom.right=-0.07902989:-0.3838322:1.935
+surface.top.left=-0.4209068:-0.08396754:1.500019
+surface.top.right=-0.07678162:-0.07542679:1.927019
+tracker.surface.bottom.left=-0.9023271:0.6777156:0.3481688
+tracker.surface.bottom.right=-0.8194802:0.7016946:-0.1934816
+tracker.surface.top.left=-0.9034357:0.985936:0.3616449
+tracker.surface.top.right=-0.8205888:1.009915:-0.1800058

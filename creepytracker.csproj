@@ -112,7 +112,7 @@
     <None Include="Assets\Shaders\GS Billboard.shader" />
     <None Include="Assets\Shaders\VertexColor.shader" />
     <None Include="Assets\Shaders\simpleBillboard.shader" />
-    <None Include="Assets\Surfaces\Dell.txt" />
+    <None Include="Assets\Surfaces\rectangle.txt" />
     <None Include="Assets\common\Models\Shaders\Skybox-Procedural.shader" />
     <None Include="Assets\common\Shaders\Grid.shader" />
     <None Include="Assets\configSettings.txt" />
