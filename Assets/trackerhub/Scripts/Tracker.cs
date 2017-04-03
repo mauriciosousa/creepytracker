@@ -458,7 +458,15 @@ public class Tracker : MonoBehaviour
 		n.notifySend (NotificationLevel.INFO, "Calibration complete", "Config file updated", 5000);
 	}
 
-	internal Vector3 getJointPosition (int id, JointType joint, Vector3 garbage)
+    internal string getHandState(int id, BodyPropertiesTypes type)
+    {
+        Human h = _humans[id];
+        SensorBody s = h.bodies[0];
+
+        return s.skeleton.bodyProperties[type];
+    }
+
+    internal Vector3 getJointPosition (int id, JointType joint, Vector3 garbage)
 	{
 		Human h = _humans [id];
 		SensorBody bestBody = h.bodies [0];

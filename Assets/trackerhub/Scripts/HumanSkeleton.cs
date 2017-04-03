@@ -21,7 +21,10 @@ public class HumanSkeleton : MonoBehaviour
 	private GameObject leftFoot;
 	private GameObject rightFoot;
 
-	private AdaptiveDoubleExponentialFilterVector3 headKalman;
+    private string handStateLeft = HandState.Unknown.ToString();
+    private string handStateRight = HandState.Unknown.ToString();
+
+    private AdaptiveDoubleExponentialFilterVector3 headKalman;
 	private AdaptiveDoubleExponentialFilterVector3 neckKalman;
 	private AdaptiveDoubleExponentialFilterVector3 spineShoulderKalman;
 	private AdaptiveDoubleExponentialFilterVector3 spineMidKalman;
@@ -186,14 +189,26 @@ public class HumanSkeleton : MonoBehaviour
 
 			lastForward = forward;
 
-			// Update Joints
 
-			try {
+            handStateLeft = tracker.getHandState(ID, BodyPropertiesTypes.HandLeftState);
+            handStateRight = tracker.getHandState(ID, BodyPropertiesTypes.HandRightState);
+
+
+
+
+
+            // Update Joints
+
+
+            try
+            {
 				headKalman.Value = tracker.getJointPosition (ID, JointType.Head, headKalman.Value);
 				neckKalman.Value = tracker.getJointPosition (ID, JointType.Neck, neckKalman.Value);
 				spineShoulderKalman.Value = tracker.getJointPosition (ID, JointType.SpineShoulder, spineShoulderKalman.Value);
 				spineMidKalman.Value = tracker.getJointPosition (ID, JointType.SpineMid, spineMidKalman.Value);
 				spineBaseKalman.Value = tracker.getJointPosition (ID, JointType.SpineBase, spineBaseKalman.Value);
+
+                
 
 				if (mirror) {
 					rightShoulderKalman.Value = tracker.getJointPosition (ID, JointType.ShoulderLeft, rightShoulderKalman.Value);
