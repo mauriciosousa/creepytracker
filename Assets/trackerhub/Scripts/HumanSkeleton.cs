@@ -294,9 +294,9 @@ public class HumanSkeleton : MonoBehaviour
 		if (canSend) {
 			string pdu = BodyPropertiesTypes.UID.ToString () + MessageSeparators.SET + ID + MessageSeparators.L2;
 
-			pdu += BodyPropertiesTypes.HandLeftState.ToString () + MessageSeparators.SET + "Null" + MessageSeparators.L2;
+			pdu += BodyPropertiesTypes.HandLeftState.ToString () + MessageSeparators.SET + handStateLeft + MessageSeparators.L2;
 			pdu += BodyPropertiesTypes.HandLeftConfidence.ToString () + MessageSeparators.SET + "Null" + MessageSeparators.L2;
-			pdu += BodyPropertiesTypes.HandRightState.ToString () + MessageSeparators.SET + "Null" + MessageSeparators.L2;
+			pdu += BodyPropertiesTypes.HandRightState.ToString () + MessageSeparators.SET + handStateRight + MessageSeparators.L2;
 			pdu += BodyPropertiesTypes.HandRightConfidence.ToString () + MessageSeparators.SET + "Null" + MessageSeparators.L2;
 
 			pdu += "head" + MessageSeparators.SET + CommonUtils.convertVectorToStringRPC (headKalman.Value) + MessageSeparators.L2;
