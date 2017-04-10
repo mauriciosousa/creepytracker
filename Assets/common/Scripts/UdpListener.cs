@@ -56,7 +56,8 @@ public class UdpListener : MonoBehaviour {
                 if(toProcess != null)
                 {
                     // TMA: THe first char distinguishes between a BodyMessage and a CloudMessage
-                    if (Convert.ToChar(toProcess[0]) == 'B') {
+                    if (Convert.ToChar(toProcess[0]) == 'B')
+                    {
                         try
                         {
                             string stringToParse = Encoding.ASCII.GetString(toProcess);
@@ -82,6 +83,13 @@ public class UdpListener : MonoBehaviour {
                         string[] splitmsg = stringToParse.Split(MessageSeparators.L0);
                         AvatarMessage av = new AvatarMessage(splitmsg[1], toProcess);
                         gameObject.GetComponent<Tracker>().processAvatarMessage(av);
+                    }
+                    else if (Convert.ToChar(toProcess[0]) == 'S')
+                    {
+                        string stringToParse = Encoding.ASCII.GetString(toProcess);
+                        string[] splitmsg = stringToParse.Split(MessageSeparators.L0);
+                        SurfaceMessage av = new SurfaceMessage(splitmsg[1], toProcess);
+                        gameObject.GetComponent<Tracker>().processSurfaceMessage(av);
                     }
                 }
                 _stringsToParse.RemoveAt(0);

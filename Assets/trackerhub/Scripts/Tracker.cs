@@ -47,7 +47,7 @@ public class Tracker : MonoBehaviour
 	}
 
 
-
+    private List<Surface> _surfaces;
 
 	private Dictionary<int, Human> _humans;
 
@@ -58,8 +58,10 @@ public class Tracker : MonoBehaviour
 
 	public Material WhiteMaterial;
 
-	public string[] UnicastClients {
-		get {
+	public string[] UnicastClients
+    {
+		get
+        {
 			return _udpBroadcast.UnicastClients;
 		}
 	}
@@ -68,9 +70,12 @@ public class Tracker : MonoBehaviour
 
 	public bool colorHumans;
 
-	void Start ()
+    public Material SurfaceMaterial;
+
+    void Start ()
 	{
-		_sensors = new Dictionary<string, Sensor> ();
+        _surfaces = new List<Surface>();
+        _sensors = new Dictionary<string, Sensor> ();
 		_humans = new Dictionary<int, Human> ();
 		_deadHumans = new List<Human> ();
 		_humansToKill = new List<Human> ();
@@ -80,7 +85,7 @@ public class Tracker : MonoBehaviour
 
 		_loadConfig ();
 		_loadSavedSensors ();
-	}
+    }
 
 	void FixedUpdate ()
 	{
@@ -662,10 +667,20 @@ public class Tracker : MonoBehaviour
         Debug.Log("Forwarded request to clients " + message2);
     }
 
+    public void processSurfaceMessage(SurfaceMessage sm)
+    {
+        UdpClient udp = new UdpClient();
+        string message = sm.createSurfaceMessage(_surfaces);
+        byte[] data = Encoding.UTF8.GetBytes(message);
+        IPEndPoint remoteEndPoint = new IPEndPoint(sm.replyIPAddress, sm.port);
+        Debug.Log("Sent reply with surface's data " + message);
+        udp.Send(data, data.Length, remoteEndPoint);
+    }
+
     internal void LoadSurfaces()
     {
-        Surface [] surfaces = Surface.loadSurfaces("Surfaces");
-        foreach (Surface s in surfaces)
+        _surfaces = new List<Surface>(Surface.loadSurfaces("Surfaces"));
+        foreach (Surface s in _surfaces)
         {
             if (_sensors.ContainsKey(s.sensorid))
             {
@@ -675,9 +690,34 @@ public class Tracker : MonoBehaviour
                 GameObject tl = __createSurfaceGos("tl", s.TopLeft, s.surfaceGO.transform);
                 GameObject tr = __createSurfaceGos("tr", s.TopRight, s.surfaceGO.transform);
 
+
                 gameObject.GetComponent<DoNotify>().notifySend(NotificationLevel.INFO, "New Surface", "Surface " + s.name + " added", 5000);
 
                 s.saveSurface(bl, br, tl, tr);
+
+                MeshFilter meshFilter = (MeshFilter)s.surfaceGO.AddComponent(typeof(MeshFilter));
+                Mesh m = new Mesh();
+                m.name = s.name + "MESH";
+                m.vertices = new Vector3[]
+                {
+                    bl.transform.localPosition, br.transform.localPosition, tr.transform.localPosition, tl.transform.localPosition
+                };
+
+                m.triangles = new int[]
+                {
+                    0, 1, 3,
+                    1, 2, 3,
+                    3, 1, 0,
+                    3, 2, 1
+                };
+                m.RecalculateNormals();
+                m.RecalculateBounds();
+
+                meshFilter.mesh = m;
+                MeshRenderer renderer = s.surfaceGO.AddComponent(typeof(MeshRenderer)) as MeshRenderer;
+                renderer.material = SurfaceMaterial;
+                MeshCollider collider = s.surfaceGO.AddComponent(typeof(MeshCollider)) as MeshCollider;
+
 
             }
         }
@@ -688,7 +728,7 @@ public class Tracker : MonoBehaviour
         GameObject g = new GameObject();
         g.transform.parent = parent;
         g.transform.localRotation = Quaternion.identity;
-        g.name = name;
+        g.name = name + "lol";
         g.transform.localPosition = CommonUtils.pointKinectToUnity(position); 
         return g;
     }

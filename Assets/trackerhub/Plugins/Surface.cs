@@ -12,6 +12,10 @@ public class Surface
     public Vector3 BottomRight;
     public Vector3 TopLeft;
     public Vector3 TopRight;
+    public Vector3 cBottomLeft;
+    public Vector3 cBottomRight;
+    public Vector3 cTopLeft;
+    public Vector3 cTopRight;
     public GameObject surfaceGO;
 
     public string filename;
@@ -25,6 +29,10 @@ public class Surface
         BottomRight = Vector3.zero;
         TopLeft = Vector3.zero;
         TopRight = Vector3.zero;
+        cBottomLeft = Vector3.zero;
+        cBottomRight = Vector3.zero;
+        cTopLeft = Vector3.zero;
+        cTopRight = Vector3.zero;
         surfaceGO = null;
     }
 
@@ -79,6 +87,11 @@ public class Surface
 
     internal void saveSurface(GameObject bl, GameObject br, GameObject tl, GameObject tr)
     {
+        cBottomLeft = bl.transform.position;
+        cBottomRight = br.transform.position;
+        cTopLeft = tl.transform.position;
+        cTopRight = tr.transform.position;
+
         if (File.Exists(filename))
         {
             using (System.IO.StreamWriter file = new System.IO.StreamWriter(filename, false))
