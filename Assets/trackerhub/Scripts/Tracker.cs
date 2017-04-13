@@ -540,7 +540,8 @@ public class Tracker : MonoBehaviour
 		// save properties
 		ConfigProperties.save (filePath, "udp.listenport", "" + TrackerProperties.Instance.listenPort);
 		ConfigProperties.save (filePath, "udp.broadcastport", "" + TrackerProperties.Instance.broadcastPort);
-		ConfigProperties.save (filePath, "udp.sendinterval", "" + TrackerProperties.Instance.sendInterval);
+        ConfigProperties.save(filePath, "udp.sensor.listener", "" + TrackerProperties.Instance.sensorListenPort);
+        ConfigProperties.save (filePath, "udp.sendinterval", "" + TrackerProperties.Instance.sendInterval);
 		ConfigProperties.save (filePath, "tracker.mergedistance", "" + TrackerProperties.Instance.mergeDistance);
 		ConfigProperties.save (filePath, "tracker.confidencethreshold", "" + TrackerProperties.Instance.confidenceTreshold);
 //		ConfigProperties.save (filePath, "tracker.filtergain", "" + AdaptiveDoubleExponentialFilterFloat.Gain);
@@ -571,7 +572,13 @@ public class Tracker : MonoBehaviour
 		}
 		resetBroadcast ();
 
-		string aux = ConfigProperties.load (filePath, "tracker.mergedistance");
+        port = ConfigProperties.load(filePath, "udp.sensor.listen");
+        if (port != "")
+        {
+            TrackerProperties.Instance.sensorListenPort = int.Parse(port);
+        }
+
+        string aux = ConfigProperties.load (filePath, "tracker.mergedistance");
 		if (aux != "") {
 			TrackerProperties.Instance.mergeDistance = float.Parse (aux);
 		}
@@ -637,7 +644,7 @@ public class Tracker : MonoBehaviour
 		UdpClient udp = new UdpClient ();
 		string message = CloudMessage.createRequestMessage (2,Network.player.ipAddress, TrackerProperties.Instance.listenPort); 
 		byte[] data = Encoding.UTF8.GetBytes(message);
-		IPEndPoint remoteEndPoint = new IPEndPoint(IPAddress.Broadcast, TrackerProperties.Instance.listenPort + 1);
+		IPEndPoint remoteEndPoint = new IPEndPoint(IPAddress.Broadcast, TrackerProperties.Instance.sensorListenPort);
 		udp.Send(data, data.Length, remoteEndPoint);
 	}
 
@@ -646,7 +653,7 @@ public class Tracker : MonoBehaviour
 		UdpClient udp = new UdpClient ();
 		string message = CloudMessage.createRequestMessage (continuous ? 1 : 0, Network.player.ipAddress, TrackerProperties.Instance.listenPort); 
 		byte[] data = Encoding.UTF8.GetBytes (message);
-		IPEndPoint remoteEndPoint = new IPEndPoint (IPAddress.Broadcast, TrackerProperties.Instance.listenPort + 1);
+		IPEndPoint remoteEndPoint = new IPEndPoint (IPAddress.Broadcast, TrackerProperties.Instance.sensorListenPort);
 		udp.Send (data, data.Length, remoteEndPoint);
 	}
 
@@ -662,7 +669,7 @@ public class Tracker : MonoBehaviour
         //broadcast
         string message2 = CloudMessage.createRequestMessage(av.mode, av.replyIPAddress.ToString(), av.port);
         byte[] data2 = Encoding.UTF8.GetBytes(message2);
-        IPEndPoint remoteEndPoint2 = new IPEndPoint(IPAddress.Broadcast, TrackerProperties.Instance.listenPort + 1);
+        IPEndPoint remoteEndPoint2 = new IPEndPoint(IPAddress.Broadcast, TrackerProperties.Instance.sensorListenPort);
         udp.Send(data2, data2.Length, remoteEndPoint2);
         Debug.Log("Forwarded request to clients " + message2);
     }

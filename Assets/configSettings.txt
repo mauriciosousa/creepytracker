@@ -1,7 +1,0 @@
-%Config File created in 2017-03-01 18:36:43
-udp.listenport=33333
-udp.broadcastport=53804
-udp.sendinterval=50
-tracker.mergedistance=0.3
-tracker.confidencethreshold=10
-kinect.AVESTRUZ=AVESTRUZ;0.2117969;1.068308;1.449643;0.01430117;-0.9654757;-0.009083818;0.2599417
