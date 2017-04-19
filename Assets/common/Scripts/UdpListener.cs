@@ -12,7 +12,6 @@ public class UdpListener : MonoBehaviour {
     private IPEndPoint _anyIP;
     private List<byte[]> _stringsToParse; // TMA: Store the bytes from the socket instead of converting to strings. Saves time.
     private byte[] _receivedBytes;
-    private int number = 0;
     //so we don't have to create again
     CloudMessage message;
 
@@ -94,7 +93,7 @@ public class UdpListener : MonoBehaviour {
                 }
                 _stringsToParse.RemoveAt(0);
             }
-            catch (Exception exc) { _stringsToParse.RemoveAt(0); }
+            catch (Exception /*e*/) { _stringsToParse.RemoveAt(0); }
         }
     }
 

@@ -18,6 +18,11 @@ public class CommonUtils
         return "" + Math.Round(v.x, decimalsRound) + MessageSeparators.L3 + Math.Round(v.y, decimalsRound) + MessageSeparators.L3 + Math.Round(v.z, decimalsRound);
     }
 
+    internal static string convertCameraDepthPointToStringRPC(Kinect.DepthSpacePoint p)
+    {
+        return "" + Math.Round(p.X, 3) + MessageSeparators.L3 + Math.Round(p.Y, 3) + MessageSeparators.L3 + 0;
+    }
+
     internal static string convertQuaternionToStringRPC(Quaternion v)
     {
         return "" + v.w + MessageSeparators.L3 + v.x + MessageSeparators.L3 + v.y + MessageSeparators.L3 + v.y;

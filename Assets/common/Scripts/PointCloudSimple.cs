@@ -27,8 +27,6 @@ public class PointCloudSimple : MonoBehaviour
     int h;
     Vector3[] posBucket;
     Color[] colBucket;
-    byte[] buffer;
-
 
     void readFileWithColor(string f)
     {
@@ -39,7 +37,7 @@ public class PointCloudSimple : MonoBehaviour
 
         string line = "";
         int i = 0;
-        Mesh m = new Mesh();
+
         while (!sr.EndOfStream)
         {
             line = sr.ReadLine();
@@ -259,7 +257,6 @@ public class PointCloudSimple : MonoBehaviour
         for (int i = 0; i < 4; i++)
         {
             GameObject a = new GameObject("highres_cloud" + i);
-            MeshFilter mf = a.AddComponent<MeshFilter>();
             MeshRenderer mr = a.AddComponent<MeshRenderer>();
             mr.material = mat;
             a.transform.parent = this.gameObject.transform;
@@ -270,7 +267,6 @@ public class PointCloudSimple : MonoBehaviour
         for (int i = 0; i < 4; i++)
         {
             GameObject a = new GameObject("lowres_cloud" + i);
-            MeshFilter mf = a.AddComponent<MeshFilter>();
             MeshRenderer mr = a.AddComponent<MeshRenderer>();
             mr.material = other;
             a.transform.parent = this.gameObject.transform;
@@ -299,7 +295,6 @@ public class PointCloudSimple : MonoBehaviour
             colBucket[i] = new Color();
         }
 
-        buffer = new byte[4]; // Buffer for the x, y and z floats
         pointCount = 0;
         l = 0;
         h = 0;

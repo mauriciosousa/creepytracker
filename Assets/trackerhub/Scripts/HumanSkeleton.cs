@@ -5,7 +5,6 @@ using Windows.Kinect;
 
 public class HumanSkeleton : MonoBehaviour
 {
-
 	private GameObject head;
 	private GameObject leftShoulder;
 	private GameObject rightShoulder;
@@ -23,36 +22,38 @@ public class HumanSkeleton : MonoBehaviour
 
     private string handStateLeft = HandState.Unknown.ToString();
     private string handStateRight = HandState.Unknown.ToString();
+ 
+    private AdaptiveDoubleExponentialFilterVector3 headFiltered;
+	private AdaptiveDoubleExponentialFilterVector3 neckFiltered;
+	private AdaptiveDoubleExponentialFilterVector3 spineShoulderFiltered;
+	private AdaptiveDoubleExponentialFilterVector3 spineMidFiltered;
+	private AdaptiveDoubleExponentialFilterVector3 spineBaseFiltered;
 
-    private AdaptiveDoubleExponentialFilterVector3 headKalman;
-	private AdaptiveDoubleExponentialFilterVector3 neckKalman;
-	private AdaptiveDoubleExponentialFilterVector3 spineShoulderKalman;
-	private AdaptiveDoubleExponentialFilterVector3 spineMidKalman;
-	private AdaptiveDoubleExponentialFilterVector3 spineBaseKalman;
+	private AdaptiveDoubleExponentialFilterVector3 leftShoulderFiltered;
+	private AdaptiveDoubleExponentialFilterVector3 leftElbowFiltered;
+	private AdaptiveDoubleExponentialFilterVector3 leftWristFiltered;
+	private AdaptiveDoubleExponentialFilterVector3 leftHandFiltered;
+	private AdaptiveDoubleExponentialFilterVector3 leftThumbFiltered;
+	private AdaptiveDoubleExponentialFilterVector3 leftHandTipFiltered;
+	private AdaptiveDoubleExponentialFilterVector3 leftHipFiltered;
+	private AdaptiveDoubleExponentialFilterVector3 leftKneeFiltered;
+	private AdaptiveDoubleExponentialFilterVector3 leftAnkleFiltered;
+	private AdaptiveDoubleExponentialFilterVector3 leftFootFiltered;
+    private AdaptiveDoubleExponentialFilterVector3 leftHandScreenSpaceFiltered;
+    
+    private AdaptiveDoubleExponentialFilterVector3 rightShoulderFiltered;
+	private AdaptiveDoubleExponentialFilterVector3 rightElbowFiltered;
+	private AdaptiveDoubleExponentialFilterVector3 rightWristFiltered;
+	private AdaptiveDoubleExponentialFilterVector3 rightHandFiltered;
+	private AdaptiveDoubleExponentialFilterVector3 rightThumbFiltered;
+	private AdaptiveDoubleExponentialFilterVector3 rightHandTipFiltered;
+	private AdaptiveDoubleExponentialFilterVector3 rightHipFiltered;
+	private AdaptiveDoubleExponentialFilterVector3 rightKneeFiltered;
+	private AdaptiveDoubleExponentialFilterVector3 rightAnkleFiltered;
+	private AdaptiveDoubleExponentialFilterVector3 rightFootFiltered;
+    private AdaptiveDoubleExponentialFilterVector3 rightHandScreenSpaceFiltered;
 
-	private AdaptiveDoubleExponentialFilterVector3 leftShoulderKalman;
-	private AdaptiveDoubleExponentialFilterVector3 leftElbowKalman;
-	private AdaptiveDoubleExponentialFilterVector3 leftWristKalman;
-	private AdaptiveDoubleExponentialFilterVector3 leftHandKalman;
-	private AdaptiveDoubleExponentialFilterVector3 leftThumbKalman;
-	private AdaptiveDoubleExponentialFilterVector3 leftHandTipKalman;
-	private AdaptiveDoubleExponentialFilterVector3 leftHipKalman;
-	private AdaptiveDoubleExponentialFilterVector3 leftKneeKalman;
-	private AdaptiveDoubleExponentialFilterVector3 leftAnkleKalman;
-	private AdaptiveDoubleExponentialFilterVector3 leftFootKalman;
-
-	private AdaptiveDoubleExponentialFilterVector3 rightShoulderKalman;
-	private AdaptiveDoubleExponentialFilterVector3 rightElbowKalman;
-	private AdaptiveDoubleExponentialFilterVector3 rightWristKalman;
-	private AdaptiveDoubleExponentialFilterVector3 rightHandKalman;
-	private AdaptiveDoubleExponentialFilterVector3 rightThumbKalman;
-	private AdaptiveDoubleExponentialFilterVector3 rightHandTipKalman;
-	private AdaptiveDoubleExponentialFilterVector3 rightHipKalman;
-	private AdaptiveDoubleExponentialFilterVector3 rightKneeKalman;
-	private AdaptiveDoubleExponentialFilterVector3 rightAnkleKalman;
-	private AdaptiveDoubleExponentialFilterVector3 rightFootKalman;
-
-	public Tracker tracker;
+    public Tracker tracker;
 	public int ID;
 
 	private bool canSend = false;
@@ -61,10 +62,9 @@ public class HumanSkeleton : MonoBehaviour
 	private Vector3 lastForward;
 
 	//private GameObject forwardGO;
-
 	private GameObject floorForwardGameObject;
 
-	void Start ()
+	void Awake ()
 	{
 		CapsuleCollider collider = gameObject.AddComponent<CapsuleCollider> ();
 		collider.radius = 0.25f;
@@ -85,36 +85,37 @@ public class HumanSkeleton : MonoBehaviour
 		leftFoot = createSphere ("leftFoot");
 		rightFoot = createSphere ("rightFoot");
 
-		headKalman = new AdaptiveDoubleExponentialFilterVector3 ();
-		neckKalman = new AdaptiveDoubleExponentialFilterVector3 ();
-		spineShoulderKalman = new AdaptiveDoubleExponentialFilterVector3 ();
-		spineMidKalman = new AdaptiveDoubleExponentialFilterVector3 ();
-		spineBaseKalman = new AdaptiveDoubleExponentialFilterVector3 ();
+		headFiltered = new AdaptiveDoubleExponentialFilterVector3 ();
+		neckFiltered = new AdaptiveDoubleExponentialFilterVector3 ();
+		spineShoulderFiltered = new AdaptiveDoubleExponentialFilterVector3 ();
+		spineMidFiltered = new AdaptiveDoubleExponentialFilterVector3 ();
+		spineBaseFiltered = new AdaptiveDoubleExponentialFilterVector3 ();
 
-		leftShoulderKalman = new AdaptiveDoubleExponentialFilterVector3 ();
-		leftElbowKalman = new AdaptiveDoubleExponentialFilterVector3 ();
-		leftWristKalman = new AdaptiveDoubleExponentialFilterVector3 ();
-		leftHandKalman = new AdaptiveDoubleExponentialFilterVector3 ();
-		leftThumbKalman = new AdaptiveDoubleExponentialFilterVector3 ();
-		leftHandTipKalman = new AdaptiveDoubleExponentialFilterVector3 ();
-		leftHipKalman = new AdaptiveDoubleExponentialFilterVector3 ();
-		leftKneeKalman = new AdaptiveDoubleExponentialFilterVector3 ();
-		leftAnkleKalman = new AdaptiveDoubleExponentialFilterVector3 ();
-		leftFootKalman = new AdaptiveDoubleExponentialFilterVector3 ();
+		leftShoulderFiltered = new AdaptiveDoubleExponentialFilterVector3 ();
+		leftElbowFiltered = new AdaptiveDoubleExponentialFilterVector3 ();
+		leftWristFiltered = new AdaptiveDoubleExponentialFilterVector3 ();
+		leftHandFiltered = new AdaptiveDoubleExponentialFilterVector3 ();
+		leftThumbFiltered = new AdaptiveDoubleExponentialFilterVector3 ();
+		leftHandTipFiltered = new AdaptiveDoubleExponentialFilterVector3 ();
+		leftHipFiltered = new AdaptiveDoubleExponentialFilterVector3 ();
+		leftKneeFiltered = new AdaptiveDoubleExponentialFilterVector3 ();
+		leftAnkleFiltered = new AdaptiveDoubleExponentialFilterVector3 ();
+		leftFootFiltered = new AdaptiveDoubleExponentialFilterVector3 ();
+        leftHandScreenSpaceFiltered = new AdaptiveDoubleExponentialFilterVector3 ();
 
-		rightShoulderKalman = new AdaptiveDoubleExponentialFilterVector3 ();
-		rightElbowKalman = new AdaptiveDoubleExponentialFilterVector3 ();
-		rightWristKalman = new AdaptiveDoubleExponentialFilterVector3 ();
-		rightHandKalman = new AdaptiveDoubleExponentialFilterVector3 ();
-		rightThumbKalman = new AdaptiveDoubleExponentialFilterVector3 ();
-		rightHandTipKalman = new AdaptiveDoubleExponentialFilterVector3 ();
-		rightHipKalman = new AdaptiveDoubleExponentialFilterVector3 ();
-		rightKneeKalman = new AdaptiveDoubleExponentialFilterVector3 ();
-		rightAnkleKalman = new AdaptiveDoubleExponentialFilterVector3 ();
-		rightFootKalman = new AdaptiveDoubleExponentialFilterVector3 ();
+		rightShoulderFiltered = new AdaptiveDoubleExponentialFilterVector3 ();
+		rightElbowFiltered = new AdaptiveDoubleExponentialFilterVector3 ();
+		rightWristFiltered = new AdaptiveDoubleExponentialFilterVector3 ();
+		rightHandFiltered = new AdaptiveDoubleExponentialFilterVector3 ();
+		rightThumbFiltered = new AdaptiveDoubleExponentialFilterVector3 ();
+		rightHandTipFiltered = new AdaptiveDoubleExponentialFilterVector3 ();
+		rightHipFiltered = new AdaptiveDoubleExponentialFilterVector3 ();
+		rightKneeFiltered = new AdaptiveDoubleExponentialFilterVector3 ();
+		rightAnkleFiltered = new AdaptiveDoubleExponentialFilterVector3 ();
+		rightFootFiltered = new AdaptiveDoubleExponentialFilterVector3 ();
+        rightHandScreenSpaceFiltered = new AdaptiveDoubleExponentialFilterVector3 ();
 
 		canSend = true;
-
 		lastForward = Vector3.zero;
 
 		//forwardGO = new GameObject();
@@ -130,7 +131,6 @@ public class HumanSkeleton : MonoBehaviour
 		floorForwardGameObject.name = "Forward";
 		floorForwardGameObject.tag = "nocolor";
 		floorForwardGameObject.transform.parent = transform;
-
 	}
 
 	private GameObject createSphere (string name, float scale = 0.1f)
@@ -153,24 +153,26 @@ public class HumanSkeleton : MonoBehaviour
 
 	private Vector3 calcForward ()
 	{
-		Vector3 spineRight = rightShoulderKalman.Value - spineShoulderKalman.Value;
-		Vector3 spineUp = spineShoulderKalman.Value - spineMidKalman.Value;
+		Vector3 spineRight = rightShoulderFiltered.Value - spineShoulderFiltered.Value;
+		Vector3 spineUp = spineShoulderFiltered.Value - spineMidFiltered.Value;
 
 		return Vector3.Cross (spineRight, spineUp);
 	}
 
 	public void updateSkeleton ()
 	{
-		if (tracker.humanHasBodies (ID)) {
+		if (tracker.humanHasBodies(ID))
+        {
 			// Update Forward (mirror or not to mirror?)
-
 			Vector3 forward = calcUnfilteredForward ();
 
-			if (lastForward != Vector3.zero) {
+			if (lastForward != Vector3.zero)
+            {
 				Vector3 projectedForward = new Vector3 (forward.x, 0, forward.z);
 				Vector3 projectedLastForward = new Vector3 (lastForward.x, 0, lastForward.z);
 
-				if (Vector3.Angle (projectedLastForward, projectedForward) > 90) {                //if (Vector3.Angle(projectedLastForward, -projectedForward) < Vector3.Angle(projectedLastForward, projectedForward)) // the same as above
+				if (Vector3.Angle (projectedLastForward, projectedForward) > 90) //if (Vector3.Angle(projectedLastForward, -projectedForward) < Vector3.Angle(projectedLastForward, projectedForward)) // the same as above
+                {              
 					mirror = !mirror;
 					forward = calcUnfilteredForward ();
 					projectedForward = new Vector3 (forward.x, 0, forward.z);
@@ -178,10 +180,11 @@ public class HumanSkeleton : MonoBehaviour
 
 				// Front for sure?
 
-				Vector3 elbowHand1 = tracker.getJointPosition (ID, JointType.HandRight, rightHandKalman.Value) - tracker.getJointPosition (ID, JointType.ElbowRight, rightElbowKalman.Value);
-				Vector3 elbowHand2 = tracker.getJointPosition (ID, JointType.HandLeft, leftHandKalman.Value) - tracker.getJointPosition (ID, JointType.ElbowLeft, leftElbowKalman.Value);
+				Vector3 elbowHand1 = tracker.getJointPosition (ID, JointType.HandRight, rightHandFiltered.Value) - tracker.getJointPosition (ID, JointType.ElbowRight, rightElbowFiltered.Value);
+				Vector3 elbowHand2 = tracker.getJointPosition (ID, JointType.HandLeft, leftHandFiltered.Value) - tracker.getJointPosition (ID, JointType.ElbowLeft, leftElbowFiltered.Value);
 
-				if (Vector3.Angle (elbowHand1, -projectedForward) < 30 || Vector3.Angle (elbowHand2, -projectedForward) < 30) {
+				if (Vector3.Angle (elbowHand1, -projectedForward) < 30 || Vector3.Angle (elbowHand2, -projectedForward) < 30)
+                {
 					mirror = !mirror;
 					forward = calcUnfilteredForward ();
 				}
@@ -189,101 +192,97 @@ public class HumanSkeleton : MonoBehaviour
 
 			lastForward = forward;
 
-
             handStateLeft = tracker.getHandState(ID, BodyPropertiesTypes.HandLeftState);
             handStateRight = tracker.getHandState(ID, BodyPropertiesTypes.HandRightState);
 
-
-
-
-
             // Update Joints
-
-
             try
             {
-				headKalman.Value = tracker.getJointPosition (ID, JointType.Head, headKalman.Value);
-				neckKalman.Value = tracker.getJointPosition (ID, JointType.Neck, neckKalman.Value);
-				spineShoulderKalman.Value = tracker.getJointPosition (ID, JointType.SpineShoulder, spineShoulderKalman.Value);
-				spineMidKalman.Value = tracker.getJointPosition (ID, JointType.SpineMid, spineMidKalman.Value);
-				spineBaseKalman.Value = tracker.getJointPosition (ID, JointType.SpineBase, spineBaseKalman.Value);
+				headFiltered.Value = tracker.getJointPosition (ID, JointType.Head, headFiltered.Value);
+				neckFiltered.Value = tracker.getJointPosition (ID, JointType.Neck, neckFiltered.Value);
+				spineShoulderFiltered.Value = tracker.getJointPosition (ID, JointType.SpineShoulder, spineShoulderFiltered.Value);
+				spineMidFiltered.Value = tracker.getJointPosition (ID, JointType.SpineMid, spineMidFiltered.Value);
+				spineBaseFiltered.Value = tracker.getJointPosition (ID, JointType.SpineBase, spineBaseFiltered.Value);
 
-                
+                leftHandScreenSpaceFiltered.Value = tracker.getHandScreenSpace(ID, HandScreenSpace.HandLeftPosition);
+                rightHandScreenSpaceFiltered.Value = tracker.getHandScreenSpace(ID, HandScreenSpace.HandRightPosition);
 
-				if (mirror) {
-					rightShoulderKalman.Value = tracker.getJointPosition (ID, JointType.ShoulderLeft, rightShoulderKalman.Value);
-					rightElbowKalman.Value = tracker.getJointPosition (ID, JointType.ElbowLeft, rightElbowKalman.Value);
-					rightWristKalman.Value = tracker.getJointPosition (ID, JointType.WristLeft, rightWristKalman.Value);
-					rightHandKalman.Value = tracker.getJointPosition (ID, JointType.HandLeft, rightHandKalman.Value);
-					rightThumbKalman.Value = tracker.getJointPosition (ID, JointType.ThumbLeft, rightThumbKalman.Value);
-					rightHandTipKalman.Value = tracker.getJointPosition (ID, JointType.HandTipLeft, rightHandTipKalman.Value);
-					rightHipKalman.Value = tracker.getJointPosition (ID, JointType.HipLeft, rightHipKalman.Value);
-					rightKneeKalman.Value = tracker.getJointPosition (ID, JointType.KneeLeft, rightKneeKalman.Value);
-					rightAnkleKalman.Value = tracker.getJointPosition (ID, JointType.AnkleLeft, rightAnkleKalman.Value);
-					rightFootKalman.Value = tracker.getJointPosition (ID, JointType.FootLeft, rightFootKalman.Value);
+                if (mirror)
+                {
+					rightShoulderFiltered.Value = tracker.getJointPosition (ID, JointType.ShoulderLeft, rightShoulderFiltered.Value);
+					rightElbowFiltered.Value = tracker.getJointPosition (ID, JointType.ElbowLeft, rightElbowFiltered.Value);
+					rightWristFiltered.Value = tracker.getJointPosition (ID, JointType.WristLeft, rightWristFiltered.Value);
+					rightHandFiltered.Value = tracker.getJointPosition (ID, JointType.HandLeft, rightHandFiltered.Value);
+					rightThumbFiltered.Value = tracker.getJointPosition (ID, JointType.ThumbLeft, rightThumbFiltered.Value);
+					rightHandTipFiltered.Value = tracker.getJointPosition (ID, JointType.HandTipLeft, rightHandTipFiltered.Value);
+					rightHipFiltered.Value = tracker.getJointPosition (ID, JointType.HipLeft, rightHipFiltered.Value);
+					rightKneeFiltered.Value = tracker.getJointPosition (ID, JointType.KneeLeft, rightKneeFiltered.Value);
+					rightAnkleFiltered.Value = tracker.getJointPosition (ID, JointType.AnkleLeft, rightAnkleFiltered.Value);
+					rightFootFiltered.Value = tracker.getJointPosition (ID, JointType.FootLeft, rightFootFiltered.Value);
 
-					leftShoulderKalman.Value = tracker.getJointPosition (ID, JointType.ShoulderRight, leftShoulderKalman.Value);
-					leftElbowKalman.Value = tracker.getJointPosition (ID, JointType.ElbowRight, leftElbowKalman.Value);
-					leftWristKalman.Value = tracker.getJointPosition (ID, JointType.WristRight, leftWristKalman.Value);
-					leftHandKalman.Value = tracker.getJointPosition (ID, JointType.HandRight, leftHandKalman.Value);
-					leftThumbKalman.Value = tracker.getJointPosition (ID, JointType.ThumbRight, leftThumbKalman.Value);
-					leftHandTipKalman.Value = tracker.getJointPosition (ID, JointType.HandTipRight, leftHandTipKalman.Value);
-					leftHipKalman.Value = tracker.getJointPosition (ID, JointType.HipRight, leftHipKalman.Value);
-					leftKneeKalman.Value = tracker.getJointPosition (ID, JointType.KneeRight, leftKneeKalman.Value);
-					leftAnkleKalman.Value = tracker.getJointPosition (ID, JointType.AnkleRight, leftAnkleKalman.Value);
-					leftFootKalman.Value = tracker.getJointPosition (ID, JointType.FootRight, leftFootKalman.Value);
-				} else {
-					leftShoulderKalman.Value = tracker.getJointPosition (ID, JointType.ShoulderLeft, leftShoulderKalman.Value);
-					leftElbowKalman.Value = tracker.getJointPosition (ID, JointType.ElbowLeft, leftElbowKalman.Value);
-					leftWristKalman.Value = tracker.getJointPosition (ID, JointType.WristLeft, leftWristKalman.Value);
-					leftHandKalman.Value = tracker.getJointPosition (ID, JointType.HandLeft, leftHandKalman.Value);
-					leftThumbKalman.Value = tracker.getJointPosition (ID, JointType.ThumbLeft, leftThumbKalman.Value);
-					leftHandTipKalman.Value = tracker.getJointPosition (ID, JointType.HandTipLeft, leftHandTipKalman.Value);
-					leftHipKalman.Value = tracker.getJointPosition (ID, JointType.HipLeft, leftHipKalman.Value);
-					leftKneeKalman.Value = tracker.getJointPosition (ID, JointType.KneeLeft, leftKneeKalman.Value);
-					leftAnkleKalman.Value = tracker.getJointPosition (ID, JointType.AnkleLeft, leftAnkleKalman.Value);
-					leftFootKalman.Value = tracker.getJointPosition (ID, JointType.FootLeft, leftFootKalman.Value);
+					leftShoulderFiltered.Value = tracker.getJointPosition (ID, JointType.ShoulderRight, leftShoulderFiltered.Value);
+					leftElbowFiltered.Value = tracker.getJointPosition (ID, JointType.ElbowRight, leftElbowFiltered.Value);
+					leftWristFiltered.Value = tracker.getJointPosition (ID, JointType.WristRight, leftWristFiltered.Value);
+					leftHandFiltered.Value = tracker.getJointPosition (ID, JointType.HandRight, leftHandFiltered.Value);
+					leftThumbFiltered.Value = tracker.getJointPosition (ID, JointType.ThumbRight, leftThumbFiltered.Value);
+					leftHandTipFiltered.Value = tracker.getJointPosition (ID, JointType.HandTipRight, leftHandTipFiltered.Value);
+					leftHipFiltered.Value = tracker.getJointPosition (ID, JointType.HipRight, leftHipFiltered.Value);
+					leftKneeFiltered.Value = tracker.getJointPosition (ID, JointType.KneeRight, leftKneeFiltered.Value);
+					leftAnkleFiltered.Value = tracker.getJointPosition (ID, JointType.AnkleRight, leftAnkleFiltered.Value);
+					leftFootFiltered.Value = tracker.getJointPosition (ID, JointType.FootRight, leftFootFiltered.Value);
+				}
+                else
+                {
+					leftShoulderFiltered.Value = tracker.getJointPosition (ID, JointType.ShoulderLeft, leftShoulderFiltered.Value);
+					leftElbowFiltered.Value = tracker.getJointPosition (ID, JointType.ElbowLeft, leftElbowFiltered.Value);
+					leftWristFiltered.Value = tracker.getJointPosition (ID, JointType.WristLeft, leftWristFiltered.Value);
+					leftHandFiltered.Value = tracker.getJointPosition (ID, JointType.HandLeft, leftHandFiltered.Value);
+					leftThumbFiltered.Value = tracker.getJointPosition (ID, JointType.ThumbLeft, leftThumbFiltered.Value);
+					leftHandTipFiltered.Value = tracker.getJointPosition (ID, JointType.HandTipLeft, leftHandTipFiltered.Value);
+					leftHipFiltered.Value = tracker.getJointPosition (ID, JointType.HipLeft, leftHipFiltered.Value);
+					leftKneeFiltered.Value = tracker.getJointPosition (ID, JointType.KneeLeft, leftKneeFiltered.Value);
+					leftAnkleFiltered.Value = tracker.getJointPosition (ID, JointType.AnkleLeft, leftAnkleFiltered.Value);
+					leftFootFiltered.Value = tracker.getJointPosition (ID, JointType.FootLeft, leftFootFiltered.Value);
 
-					rightShoulderKalman.Value = tracker.getJointPosition (ID, JointType.ShoulderRight, rightShoulderKalman.Value);
-					rightElbowKalman.Value = tracker.getJointPosition (ID, JointType.ElbowRight, rightElbowKalman.Value);
-					rightWristKalman.Value = tracker.getJointPosition (ID, JointType.WristRight, rightWristKalman.Value);
-					rightHandKalman.Value = tracker.getJointPosition (ID, JointType.HandRight, rightHandKalman.Value);
-					rightThumbKalman.Value = tracker.getJointPosition (ID, JointType.ThumbRight, rightThumbKalman.Value);
-					rightHandTipKalman.Value = tracker.getJointPosition (ID, JointType.HandTipRight, rightHandTipKalman.Value);
-					rightHipKalman.Value = tracker.getJointPosition (ID, JointType.HipRight, rightHipKalman.Value);
-					rightKneeKalman.Value = tracker.getJointPosition (ID, JointType.KneeRight, rightKneeKalman.Value);
-					rightAnkleKalman.Value = tracker.getJointPosition (ID, JointType.AnkleRight, rightAnkleKalman.Value);
-					rightFootKalman.Value = tracker.getJointPosition (ID, JointType.FootRight, rightFootKalman.Value);
+					rightShoulderFiltered.Value = tracker.getJointPosition (ID, JointType.ShoulderRight, rightShoulderFiltered.Value);
+					rightElbowFiltered.Value = tracker.getJointPosition (ID, JointType.ElbowRight, rightElbowFiltered.Value);
+					rightWristFiltered.Value = tracker.getJointPosition (ID, JointType.WristRight, rightWristFiltered.Value);
+					rightHandFiltered.Value = tracker.getJointPosition (ID, JointType.HandRight, rightHandFiltered.Value);
+					rightThumbFiltered.Value = tracker.getJointPosition (ID, JointType.ThumbRight, rightThumbFiltered.Value);
+					rightHandTipFiltered.Value = tracker.getJointPosition (ID, JointType.HandTipRight, rightHandTipFiltered.Value);
+                    rightHipFiltered.Value = tracker.getJointPosition (ID, JointType.HipRight, rightHipFiltered.Value);
+					rightKneeFiltered.Value = tracker.getJointPosition (ID, JointType.KneeRight, rightKneeFiltered.Value);
+					rightAnkleFiltered.Value = tracker.getJointPosition (ID, JointType.AnkleRight, rightAnkleFiltered.Value);
+					rightFootFiltered.Value = tracker.getJointPosition (ID, JointType.FootRight, rightFootFiltered.Value);
 				}
 
-				head.transform.position = headKalman.Value;
-				leftShoulder.transform.position = leftShoulderKalman.Value;
-				rightShoulder.transform.position = rightShoulderKalman.Value;
-				leftElbow.transform.position = leftElbowKalman.Value;
-				rightElbow.transform.position = rightElbowKalman.Value;
-				leftHand.transform.position = leftHandKalman.Value;
-				rightHand.transform.position = rightHandKalman.Value;
-				spineMid.transform.position = spineMidKalman.Value;
-				leftHip.transform.position = leftHipKalman.Value;
-				rightHip.transform.position = rightHipKalman.Value;
-				leftKnee.transform.position = leftKneeKalman.Value;
-				rightKnee.transform.position = rightKneeKalman.Value;
-				leftFoot.transform.position = leftFootKalman.Value;
-				rightFoot.transform.position = rightFootKalman.Value;
+				head.transform.position = headFiltered.Value;
+				leftShoulder.transform.position = leftShoulderFiltered.Value;
+				rightShoulder.transform.position = rightShoulderFiltered.Value;
+				leftElbow.transform.position = leftElbowFiltered.Value;
+				rightElbow.transform.position = rightElbowFiltered.Value;
+				leftHand.transform.position = leftHandFiltered.Value;
+				rightHand.transform.position = rightHandFiltered.Value;
+				spineMid.transform.position = spineMidFiltered.Value;
+				leftHip.transform.position = leftHipFiltered.Value;
+				rightHip.transform.position = rightHipFiltered.Value;
+				leftKnee.transform.position = leftKneeFiltered.Value;
+				rightKnee.transform.position = rightKneeFiltered.Value;
+				leftFoot.transform.position = leftFootFiltered.Value;
+				rightFoot.transform.position = rightFootFiltered.Value;
 
 				// update forward
-
 				Vector3 fw = calcForward ();
 				Vector3 pos = spineMid.transform.position;
 
 				//forwardGO.transform.forward = fw;
 				//forwardGO.transform.position = pos;
-
 				floorForwardGameObject.transform.forward = new Vector3 (fw.x, 0, fw.z);
 				floorForwardGameObject.transform.position = new Vector3 (pos.x, 0.001f, pos.z);
 				floorForwardGameObject.transform.parent = transform;
-
-			} catch (Exception e) {
+			}
+            catch (Exception e)
+            {
 				Debug.Log (e.Message + "\n" + e.StackTrace);
 			}
 		}
@@ -291,50 +290,56 @@ public class HumanSkeleton : MonoBehaviour
 
 	internal string getPDU ()
 	{
-		if (canSend) {
-			string pdu = BodyPropertiesTypes.UID.ToString () + MessageSeparators.SET + ID + MessageSeparators.L2;
+        if (canSend)
+        {
+            string pdu = BodyPropertiesTypes.UID.ToString() + MessageSeparators.SET + ID + MessageSeparators.L2;
 
-			pdu += BodyPropertiesTypes.HandLeftState.ToString () + MessageSeparators.SET + handStateLeft + MessageSeparators.L2;
-			pdu += BodyPropertiesTypes.HandLeftConfidence.ToString () + MessageSeparators.SET + "Null" + MessageSeparators.L2;
-			pdu += BodyPropertiesTypes.HandRightState.ToString () + MessageSeparators.SET + handStateRight + MessageSeparators.L2;
-			pdu += BodyPropertiesTypes.HandRightConfidence.ToString () + MessageSeparators.SET + "Null" + MessageSeparators.L2;
+            pdu += BodyPropertiesTypes.HandLeftState.ToString() + MessageSeparators.SET + handStateLeft + MessageSeparators.L2;
+            pdu += BodyPropertiesTypes.HandLeftConfidence.ToString() + MessageSeparators.SET + "Null" + MessageSeparators.L2;
+            pdu += BodyPropertiesTypes.HandRightState.ToString() + MessageSeparators.SET + handStateRight + MessageSeparators.L2;
+            pdu += BodyPropertiesTypes.HandRightConfidence.ToString() + MessageSeparators.SET + "Null" + MessageSeparators.L2;
 
-			pdu += "head" + MessageSeparators.SET + CommonUtils.convertVectorToStringRPC (headKalman.Value) + MessageSeparators.L2;
-			pdu += "neck" + MessageSeparators.SET + CommonUtils.convertVectorToStringRPC (neckKalman.Value) + MessageSeparators.L2;
-			pdu += "spineShoulder" + MessageSeparators.SET + CommonUtils.convertVectorToStringRPC (spineShoulderKalman.Value) + MessageSeparators.L2;
-			pdu += "spineMid" + MessageSeparators.SET + CommonUtils.convertVectorToStringRPC (spineMidKalman.Value) + MessageSeparators.L2;
-			pdu += "spineBase" + MessageSeparators.SET + CommonUtils.convertVectorToStringRPC (spineBaseKalman.Value) + MessageSeparators.L2;
+            pdu += HandScreenSpace.HandLeftPosition.ToString() + MessageSeparators.SET + CommonUtils.convertVectorToStringRPC(leftHandScreenSpaceFiltered.Value) + MessageSeparators.L2;
+            pdu += HandScreenSpace.HandRightPosition.ToString() + MessageSeparators.SET + CommonUtils.convertVectorToStringRPC(rightHandScreenSpaceFiltered.Value) + MessageSeparators.L2;
 
-			pdu += "leftShoulder" + MessageSeparators.SET + CommonUtils.convertVectorToStringRPC (leftShoulderKalman.Value) + MessageSeparators.L2;
-			pdu += "leftElbow" + MessageSeparators.SET + CommonUtils.convertVectorToStringRPC (leftElbowKalman.Value) + MessageSeparators.L2;
-			pdu += "leftWrist" + MessageSeparators.SET + CommonUtils.convertVectorToStringRPC (leftWristKalman.Value) + MessageSeparators.L2;
-			pdu += "leftHand" + MessageSeparators.SET + CommonUtils.convertVectorToStringRPC (leftHandKalman.Value) + MessageSeparators.L2;
-			pdu += "leftThumb" + MessageSeparators.SET + CommonUtils.convertVectorToStringRPC (leftThumbKalman.Value) + MessageSeparators.L2;
-			pdu += "leftHandTip" + MessageSeparators.SET + CommonUtils.convertVectorToStringRPC (leftHandTipKalman.Value) + MessageSeparators.L2;
-			pdu += "leftHip" + MessageSeparators.SET + CommonUtils.convertVectorToStringRPC (leftHipKalman.Value) + MessageSeparators.L2;
-			pdu += "leftKnee" + MessageSeparators.SET + CommonUtils.convertVectorToStringRPC (leftKneeKalman.Value) + MessageSeparators.L2;
-			pdu += "leftAnkle" + MessageSeparators.SET + CommonUtils.convertVectorToStringRPC (leftAnkleKalman.Value) + MessageSeparators.L2;
-			pdu += "leftFoot" + MessageSeparators.SET + CommonUtils.convertVectorToStringRPC (leftFootKalman.Value) + MessageSeparators.L2;
+            pdu += "head" + MessageSeparators.SET + CommonUtils.convertVectorToStringRPC(headFiltered.Value) + MessageSeparators.L2;
+            pdu += "neck" + MessageSeparators.SET + CommonUtils.convertVectorToStringRPC(neckFiltered.Value) + MessageSeparators.L2;
+            pdu += "spineShoulder" + MessageSeparators.SET + CommonUtils.convertVectorToStringRPC(spineShoulderFiltered.Value) + MessageSeparators.L2;
+            pdu += "spineMid" + MessageSeparators.SET + CommonUtils.convertVectorToStringRPC(spineMidFiltered.Value) + MessageSeparators.L2;
+            pdu += "spineBase" + MessageSeparators.SET + CommonUtils.convertVectorToStringRPC(spineBaseFiltered.Value) + MessageSeparators.L2;
 
-			pdu += "rightShoulder" + MessageSeparators.SET + CommonUtils.convertVectorToStringRPC (rightShoulderKalman.Value) + MessageSeparators.L2;
-			pdu += "rightElbow" + MessageSeparators.SET + CommonUtils.convertVectorToStringRPC (rightElbowKalman.Value) + MessageSeparators.L2;
-			pdu += "rightWrist" + MessageSeparators.SET + CommonUtils.convertVectorToStringRPC (rightWristKalman.Value) + MessageSeparators.L2;
-			pdu += "rightHand" + MessageSeparators.SET + CommonUtils.convertVectorToStringRPC (rightHandKalman.Value) + MessageSeparators.L2;
-			pdu += "rightThumb" + MessageSeparators.SET + CommonUtils.convertVectorToStringRPC (rightThumbKalman.Value) + MessageSeparators.L2;
-			pdu += "rightHandTip" + MessageSeparators.SET + CommonUtils.convertVectorToStringRPC (rightHandTipKalman.Value) + MessageSeparators.L2;
-			pdu += "rightHip" + MessageSeparators.SET + CommonUtils.convertVectorToStringRPC (rightHipKalman.Value) + MessageSeparators.L2;
-			pdu += "rightKnee" + MessageSeparators.SET + CommonUtils.convertVectorToStringRPC (rightKneeKalman.Value) + MessageSeparators.L2;
-			pdu += "rightAnkle" + MessageSeparators.SET + CommonUtils.convertVectorToStringRPC (rightAnkleKalman.Value) + MessageSeparators.L2;
-			pdu += "rightFoot" + MessageSeparators.SET + CommonUtils.convertVectorToStringRPC (rightFootKalman.Value);
+            pdu += "leftShoulder" + MessageSeparators.SET + CommonUtils.convertVectorToStringRPC(leftShoulderFiltered.Value) + MessageSeparators.L2;
+            pdu += "leftElbow" + MessageSeparators.SET + CommonUtils.convertVectorToStringRPC(leftElbowFiltered.Value) + MessageSeparators.L2;
+            pdu += "leftWrist" + MessageSeparators.SET + CommonUtils.convertVectorToStringRPC(leftWristFiltered.Value) + MessageSeparators.L2;
+            pdu += "leftHand" + MessageSeparators.SET + CommonUtils.convertVectorToStringRPC(leftHandFiltered.Value) + MessageSeparators.L2;
+            pdu += "leftThumb" + MessageSeparators.SET + CommonUtils.convertVectorToStringRPC(leftThumbFiltered.Value) + MessageSeparators.L2;
+            pdu += "leftHandTip" + MessageSeparators.SET + CommonUtils.convertVectorToStringRPC(leftHandTipFiltered.Value) + MessageSeparators.L2;
+            pdu += "leftHip" + MessageSeparators.SET + CommonUtils.convertVectorToStringRPC(leftHipFiltered.Value) + MessageSeparators.L2;
+            pdu += "leftKnee" + MessageSeparators.SET + CommonUtils.convertVectorToStringRPC(leftKneeFiltered.Value) + MessageSeparators.L2;
+            pdu += "leftAnkle" + MessageSeparators.SET + CommonUtils.convertVectorToStringRPC(leftAnkleFiltered.Value) + MessageSeparators.L2;
+            pdu += "leftFoot" + MessageSeparators.SET + CommonUtils.convertVectorToStringRPC(leftFootFiltered.Value) + MessageSeparators.L2;
 
-			return pdu;
-		} else
-			throw new Exception ("Human not initalized.");
+            pdu += "rightShoulder" + MessageSeparators.SET + CommonUtils.convertVectorToStringRPC(rightShoulderFiltered.Value) + MessageSeparators.L2;
+            pdu += "rightElbow" + MessageSeparators.SET + CommonUtils.convertVectorToStringRPC(rightElbowFiltered.Value) + MessageSeparators.L2;
+            pdu += "rightWrist" + MessageSeparators.SET + CommonUtils.convertVectorToStringRPC(rightWristFiltered.Value) + MessageSeparators.L2;
+            pdu += "rightHand" + MessageSeparators.SET + CommonUtils.convertVectorToStringRPC(rightHandFiltered.Value) + MessageSeparators.L2;
+            pdu += "rightThumb" + MessageSeparators.SET + CommonUtils.convertVectorToStringRPC(rightThumbFiltered.Value) + MessageSeparators.L2;
+            pdu += "rightHandTip" + MessageSeparators.SET + CommonUtils.convertVectorToStringRPC(rightHandTipFiltered.Value) + MessageSeparators.L2;
+            pdu += "rightHip" + MessageSeparators.SET + CommonUtils.convertVectorToStringRPC(rightHipFiltered.Value) + MessageSeparators.L2;
+            pdu += "rightKnee" + MessageSeparators.SET + CommonUtils.convertVectorToStringRPC(rightKneeFiltered.Value) + MessageSeparators.L2;
+            pdu += "rightAnkle" + MessageSeparators.SET + CommonUtils.convertVectorToStringRPC(rightAnkleFiltered.Value) + MessageSeparators.L2;
+            pdu += "rightFoot" + MessageSeparators.SET + CommonUtils.convertVectorToStringRPC(rightFootFiltered.Value);
+
+            return pdu;
+        }
+        else
+        {
+            throw new Exception("Human not initalized.");
+        }
 	}
 
 	public Vector3 getHead ()
 	{
-		return headKalman.Value;
+		return headFiltered.Value;
 	}
-
 }

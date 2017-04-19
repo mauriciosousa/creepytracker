@@ -52,8 +52,6 @@ public class TrackerUI : MonoBehaviour
 
 	private int packetsPerSec;
 
-	private string newUnicastAddress;
-	private string newUnicastPort;
 	private bool _continuous;
     private bool _hideHumans;
 
@@ -67,9 +65,6 @@ public class TrackerUI : MonoBehaviour
 		_titleStyle.normal.textColor = Color.white;
 		_continuous = false;
         _hideHumans = false;
-
-		newUnicastAddress = "";
-		newUnicastPort = "";
 
 		packetsPerSec = 1000 / TrackerProperties.Instance.sendInterval;
 	}

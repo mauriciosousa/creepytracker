@@ -1,4 +1,6 @@
-﻿Shader "Custom/VertexColor" {
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+Shader "Custom/VertexColor" {
     SubShader {
     Pass {
          Tags {"Queue"="Transparent" "IgnoreProjector"="True" "RenderType"="Transparent"}
@@ -22,7 +24,7 @@
         VertexOutput vert(VertexInput v) {
          
             VertexOutput o;
-            o.pos = mul(UNITY_MATRIX_MVP, v.v);
+            o.pos = UnityObjectToClipPos(v.v);
             o.col = v.color;
             return o;
         }
