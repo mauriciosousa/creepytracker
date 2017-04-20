@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
 using System;
 
@@ -33,29 +32,37 @@ public class Sensor
 
 	private List<Vector3> _bestFitPlanePoints;
 
-	public bool Active {
-		get {
+	public bool Active
+    {
+		get
+        {
 			return _active;
 		}
 
-		set {
+		set
+        {
 			_active = value;
 			_sensorGameObject.SetActive (_active);
 		}
 	}
 
-	public Vector3 CalibAuxPoint {
-		get {
+	public Vector3 CalibAuxPoint
+    {
+		get
+        {
 			return center1;
 		}
 	}
 
-	public Material Material {
-		get {
+	public Material Material
+    {
+		get
+        {
 			return _material;
 		}
 
-		set {
+		set
+        {
 			_material = value;
 		}
 	}
@@ -90,27 +97,28 @@ public class Sensor
 	{
 		return SensorGameObject.transform.localToWorldMatrix.MultiplyPoint (p);
 	}
-
-	
-
+    
 	internal void updateBodies ()
 	{
-
 		BodiesMessage bodiesMessage = lastBodiesMessage;
 
 		if (bodiesMessage == null)
 			return;
 
-		foreach (KeyValuePair<string, SensorBody> sb in bodies) {
+		foreach (KeyValuePair<string, SensorBody> sb in bodies)
+        {
 			sb.Value.updated = false;
 		}
 
 		// refresh bodies position
-		foreach (Skeleton sk in bodiesMessage.Bodies) {
+		foreach (Skeleton sk in bodiesMessage.Bodies)
+        {
 			SensorBody b;
 
-			if (int.Parse (sk.bodyProperties [BodyPropertiesTypes.Confidence]) < TrackerProperties.Instance.confidenceTreshold) {
-				if (bodies.ContainsKey (sk.ID)) {
+			if (int.Parse (sk.bodyProperties [BodyPropertiesTypes.Confidence]) < TrackerProperties.Instance.confidenceTreshold)
+            {
+				if (bodies.ContainsKey (sk.ID))
+                {
 					b = bodies [sk.ID];
 					b.updated = true;
 					b.lastUpdated = DateTime.Now;
@@ -120,7 +128,9 @@ public class Sensor
 
 			if (bodies.ContainsKey (sk.ID)) {   //existing bodies
 				b = bodies [sk.ID];
-			} else {   // new bodies
+			}
+            else  // new bodies
+            {  
 				b = new SensorBody (sk.ID, SensorGameObject.transform);
 				b.gameObject.GetComponent<Renderer> ().material = Material;
 				bodies [sk.ID] = b;
@@ -135,13 +145,16 @@ public class Sensor
 
 		// remove bodies no longer present
 		List<string> keysToRemove = new List<string> ();
-		foreach (KeyValuePair<string, SensorBody> sb in bodies) {
-			if (!sb.Value.updated) {
+		foreach (KeyValuePair<string, SensorBody> sb in bodies)
+        {
+			if (!sb.Value.updated)
+            {
 				GameObject.Destroy (sb.Value.gameObject);
 				keysToRemove.Add (sb.Key);
 			}
 		}
-		foreach (string key in keysToRemove) {
+		foreach (string key in keysToRemove)
+        {
 			bodies.Remove (key);
 		}
 	}
@@ -211,7 +224,6 @@ public class Sensor
 	// Thanks Sara :)
 	private Vector3 computeBestFitNormal (Vector3[] v, int n)
 	{
-
 		// Zero out sum
 		Vector3 result = Vector3.zero;
 
@@ -260,7 +272,8 @@ public class Sensor
 		Vector3 minv = new Vector3 ();
 		float min = float.PositiveInfinity;
 
-		foreach (Vector3 v in _floorValues) {
+		foreach (Vector3 v in _floorValues)
+        {
 			Vector3 tmp = pointSensorToScene (v);
 
 			if (tmp.y < min)
@@ -287,8 +300,6 @@ public class Sensor
 				CommonUtils.colors [k] = CommonUtils.colors [n];
 				CommonUtils.colors [n] = value;
 			}
-
-
 
 			_materials = new List<Material> ();
 			for (int i = 0; i < CommonUtils.colors.Count; i++) {

@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 public class KalmanFilterVector3
 {
@@ -32,7 +31,4 @@ public class KalmanFilterVector3
 		_y.Value = v.y;
 		_z.Value = v.z;
 	}
-
-
-	
 }

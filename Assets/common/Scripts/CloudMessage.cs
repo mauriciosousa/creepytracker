@@ -1,11 +1,5 @@
-﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
-using System;
-
-public class CloudMessage {
-
-
+﻿public class CloudMessage
+{
     public string message;
     public byte[] receivedBytes;
     public int headerSize;

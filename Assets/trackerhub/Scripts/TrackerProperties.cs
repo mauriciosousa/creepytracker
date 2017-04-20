@@ -1,9 +1,7 @@
 ﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
 
-public class TrackerProperties : MonoBehaviour {
-
+public class TrackerProperties : MonoBehaviour
+{
     private static TrackerProperties _singleton;
 
     public int listenPort = 57743;
@@ -34,10 +32,5 @@ public class TrackerProperties : MonoBehaviour {
         {
             return _singleton;
         }
-    }
-
-    void Start()
-    {
-        //_singleton = this;
     }
 }

@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Net;
 
-public class AvatarMessage {
-
+public class AvatarMessage
+{
     public IPAddress replyIPAddress;
     public int port;
     public int mode;

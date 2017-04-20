@@ -1,6 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
-
 
 public class KalmanFilterFloat
 {
@@ -91,5 +89,3 @@ public class KalmanFilterFloatOriginal
 		return result;
 	}	
 }
-
-

@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 using System.Threading;
 using UnityEngine;
 
@@ -35,24 +33,17 @@ public class KinectStream
 
 public class TcpKinectListener : MonoBehaviour
 {
-
-
     public bool showNetworkDetails = true;
 
     private int TcpListeningPort;
     private TcpListener _server;
 
     private bool _running;
-
     private List<KinectStream> _kinectStreams;
-
-
-
+    
     void Start()
     {
-
         //_threads = new List<Thread>();
-
         _kinectStreams = new List<KinectStream>();
 
         TcpListeningPort = TrackerProperties.Instance.listenPort;
@@ -68,7 +59,6 @@ public class TcpKinectListener : MonoBehaviour
 
     void AcceptClients(object o)
     {
-
         while (_running)
         {
             TcpClient newclient = _server.AcceptTcpClient();
@@ -77,8 +67,7 @@ public class TcpKinectListener : MonoBehaviour
             clientThread.Start(newclient);
         }
     }
-
-
+    
     void clientHandler(object o)
     {
         int SIZEHELLO = 200;
@@ -121,8 +110,6 @@ public class TcpKinectListener : MonoBehaviour
                 Debug.Log("New stream from " + l[1]);
             }
 
-
-
             while (_running)
             {
                 try
@@ -148,10 +135,13 @@ public class TcpKinectListener : MonoBehaviour
                 int size = BitConverter.ToInt32(sizeb, 0);
                 kstream.size = size;
                
-                while (size > 0) { 
-                    try{
+                while (size > 0)
+                { 
+                    try
+                    {
                         bytesRead = ns.Read(buffer, 0, size);
-                    }catch(Exception e) { 
+                    }catch(Exception e)
+                    { 
                         Debug.Log(e.Message);
                         _running = false;
                         break;

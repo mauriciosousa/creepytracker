@@ -1,8 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
-using System.Collections;
 using System;
-using System.Linq;
 using Windows.Kinect;
 using System.Net.Sockets;
 using System.Net;
@@ -70,7 +68,6 @@ public class Tracker : MonoBehaviour
 
 	void FixedUpdate ()
 	{
-
 		if (Input.GetKeyDown (KeyCode.C))
 			colorHumans = !colorHumans;
 
@@ -315,7 +312,8 @@ public class Tracker : MonoBehaviour
 								h1.Value.bodies.Add (b);
 							}
 							mergedHumans.Add (h2.Value);
-						} else
+						}
+                        else
                         {
 							h2.Value.Position = position;
 							foreach (SensorBody b in h1.Value.bodies)
@@ -443,8 +441,10 @@ public class Tracker : MonoBehaviour
 
 		avgCenter /= sensorCount;
 
-		foreach (Sensor sensor in _sensors.Values) {
-			if (sensor.lastBodiesMessage.Bodies.Count == 1 && sensor.Active) {
+		foreach (Sensor sensor in _sensors.Values)
+        {
+			if (sensor.lastBodiesMessage.Bodies.Count == 1 && sensor.Active)
+            {
 				sensor.move (avgCenter - sensor.pointSensorToScene (sensor.CalibAuxPoint));   
 			}
 		}
@@ -457,8 +457,10 @@ public class Tracker : MonoBehaviour
 
 	internal void CalibrationStep3 ()
 	{
-		foreach (Sensor sensor in _sensors.Values) {
-			if (sensor.lastBodiesMessage != null && sensor.lastBodiesMessage.Bodies.Count == 1 && sensor.Active) {
+		foreach (Sensor sensor in _sensors.Values)
+        {
+			if (sensor.lastBodiesMessage != null && sensor.lastBodiesMessage.Bodies.Count == 1 && sensor.Active)
+            {
 				sensor.calibrationStep3 ();
 			}
 		}
@@ -466,8 +468,10 @@ public class Tracker : MonoBehaviour
 
 	internal void CalibrationStep4 ()
 	{
-		foreach (Sensor sensor in _sensors.Values) {
-			if (sensor.lastBodiesMessage != null && sensor.lastBodiesMessage.Bodies.Count == 1 && sensor.Active) {
+		foreach (Sensor sensor in _sensors.Values)
+        {
+			if (sensor.lastBodiesMessage != null && sensor.lastBodiesMessage.Bodies.Count == 1 && sensor.Active)
+            {
 				sensor.calibrationStep4 ();
 			}
 		}
@@ -603,13 +607,19 @@ public class Tracker : MonoBehaviour
 		}
 		resetBroadcast ();
 
-        port = ConfigProperties.load(filePath, "udp.sensor.listen");
+        port = ConfigProperties.load(filePath, "udp.sensor.listener");
         if (port != "")
         {
             TrackerProperties.Instance.sensorListenPort = int.Parse(port);
         }
 
-        string aux = ConfigProperties.load (filePath, "tracker.mergedistance");
+        string aux = ConfigProperties.load(filePath, "udp.sendinterval");
+        if (aux != "")
+        {
+            TrackerProperties.Instance.sendInterval = int.Parse(aux);
+        }
+
+        aux = ConfigProperties.load (filePath, "tracker.mergedistance");
 		if (aux != "")
         {
 			TrackerProperties.Instance.mergeDistance = float.Parse (aux);
@@ -619,12 +629,6 @@ public class Tracker : MonoBehaviour
 		if (aux != "")
         {
 			TrackerProperties.Instance.confidenceTreshold = int.Parse (aux);
-		}
-
-		aux = ConfigProperties.load (filePath, "udp.sendinterval");
-		if (aux != "")
-        {
-			TrackerProperties.Instance.sendInterval = int.Parse (aux);
 		}
 	}
 

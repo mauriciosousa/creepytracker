@@ -1,6 +1,4 @@
 ﻿using UnityEngine;
-using System;
-using System.Collections;
 using System.Collections.Generic;
 
 public enum LogLevel
@@ -21,22 +19,28 @@ class LogMessage
 		Message = message;
 	}
 
-	public LogLevel LogLevel {
-		get {
+	public LogLevel LogLevel
+    {
+		get
+        {
 			return _logLevel;
 		}
 
-		set {
+		set
+        {
 			_logLevel = value;
 		}
 	}
 
-	public string Message {
-		get {
+	public string Message
+    {
+		get
+        {
 			return _message;
 		}
 
-		set {
+		set
+        {
 			_message = value;
 		}
 	}
@@ -77,7 +81,8 @@ public class Logger : MonoBehaviour
 	public void saveLog (LogLevel logLevel, string message)
 	{
 		LogMessage n = new LogMessage (logLevel, message);
-		if (_messages.Count >= max) {
+		if (_messages.Count >= max)
+        {
 			_messages.RemoveAt (0);
 		}
 		_messages.Add (n);

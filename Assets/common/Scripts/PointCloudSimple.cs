@@ -1,10 +1,7 @@
 ﻿using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
-
-
 
 public class PointCloudSimple : MonoBehaviour
 {
@@ -81,6 +78,7 @@ public class PointCloudSimple : MonoBehaviour
 
     }
     int countPack = 0;
+
     public void setPoints(byte[] receivedBytes, int step, uint newid, int size)
     {
 
@@ -299,5 +297,4 @@ public class PointCloudSimple : MonoBehaviour
         l = 0;
         h = 0;
     }
-
 }
