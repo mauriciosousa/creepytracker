@@ -388,8 +388,9 @@ public class Tracker : MonoBehaviour
             if (pdu[2] == "") {
                 Sensors[KinectId].lastCloud.setToView();
             }
-            else
+            else { 
                 Sensors[KinectId].lastCloud.setPoints(cloud.receivedBytes,step,id,cloud.receivedBytes.Length);
+            }
         }
 	}
 

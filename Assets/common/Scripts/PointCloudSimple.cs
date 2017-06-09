@@ -206,6 +206,7 @@ public class PointCloudSimple : MonoBehaviour
         lowres_cloud[lowres_nclouds].vertices = pointsL.ToArray();
         lowres_cloud[lowres_nclouds].colors = colorsL.ToArray();
         lowres_cloud[lowres_nclouds].SetIndices(indL.ToArray(), MeshTopology.Points, 0);
+
     }
 
     public void setToView()
@@ -213,8 +214,11 @@ public class PointCloudSimple : MonoBehaviour
         MeshFilter[] filters = GetComponentsInChildren<MeshFilter>();
         // Note that there are 8 MeshFilter -> [HR HR HR HR LR LR LR LR]
         int lr = lowres_nclouds + 4;  // Therefore, the low resolution clouds start at index 4
+        Debug.Log(filters.Length);
+
         for (int i = 0; i < filters.Length; i++)
         {
+
             MeshFilter mf = filters[i];
             if (i <= highres_nclouds)
             {
@@ -256,6 +260,7 @@ public class PointCloudSimple : MonoBehaviour
         {
             GameObject a = new GameObject("highres_cloud" + i);
             MeshRenderer mr = a.AddComponent<MeshRenderer>();
+            MeshFilter mf = a.AddComponent<MeshFilter>();
             mr.material = mat;
             a.transform.parent = this.gameObject.transform;
             a.transform.localPosition = Vector3.zero;
@@ -266,6 +271,7 @@ public class PointCloudSimple : MonoBehaviour
         {
             GameObject a = new GameObject("lowres_cloud" + i);
             MeshRenderer mr = a.AddComponent<MeshRenderer>();
+            MeshFilter mf = a.AddComponent<MeshFilter>();
             mr.material = other;
             a.transform.parent = this.gameObject.transform;
             a.transform.localPosition = Vector3.zero;

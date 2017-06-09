@@ -1,8 +1,8 @@
-%Config File created in 2017-04-19 14:15:14
-udp.listenport=33334
-udp.broadcastport=53804
-udp.sensor.listener=5007
+%Config File created in 2017-06-09 16:40:03
+udp.listenport=33333
+udp.broadcastport=44444
+udp.sensor.listener=33334
 udp.sendinterval=33
-tracker.mergedistance=0
+tracker.mergedistance=0.3
 tracker.confidencethreshold=10
-kinect.DESKTOP-S1R4IJ2=DESKTOP-S1R4IJ2;0;1;0;0;0;0;1
+kinect.ZELEONEL=ZELEONEL;0;1;0;0;0;0;1

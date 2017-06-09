@@ -113,24 +113,24 @@ Shader "Custom/Simple Billboard"
 					v[2] = float4(p[0].pos - halfS * right - halfS * up, 1.0f);
 					v[3] = float4(p[0].pos - halfS * right + halfS * up, 1.0f);
 
-					float4x4 vp = UnityObjectToClipPos(unity_WorldToObject);
+					//float4 vp = UnityObjectToClipPos(unity_WorldToObject);
 					FS_INPUT pIn;
-					pIn.pos = mul(vp, v[0]);
+					pIn.pos = UnityObjectToClipPos( v[0]);
 					pIn.tex0 = float2(1.0f, 0.0f);
 					pIn.color = p[0].color;
 					triStream.Append(pIn);
 
-					pIn.pos =  mul(vp, v[1]);
+					pIn.pos = UnityObjectToClipPos(v[1]);
 					pIn.tex0 = float2(1.0f, 1.0f);
 					pIn.color = p[0].color;
 					triStream.Append(pIn);
 
-					pIn.pos =  mul(vp, v[2]);
+					pIn.pos = UnityObjectToClipPos(v[2]);
 					pIn.tex0 = float2(0.0f, 0.0f);
 					pIn.color = p[0].color;
 					triStream.Append(pIn);
 
-					pIn.pos =  mul(vp, v[3]);
+					pIn.pos = UnityObjectToClipPos(v[3]);
 					pIn.tex0 = float2(0.0f, 1.0f);
 					pIn.color = p[0].color;
 					triStream.Append(pIn);
