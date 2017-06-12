@@ -73,7 +73,7 @@ Shader "Custom/Simple Billboard"
 				{
 					GS_INPUT output = (GS_INPUT)0;
 
-					output.pos =  mul(unity_ObjectToWorld, v.vertex);
+					output.pos =  v.vertex;
 					output.normal = v.normal;
 					output.tex0 = float2(0, 0);
 					output.color = v.color;
@@ -89,21 +89,23 @@ Shader "Custom/Simple Billboard"
 				{
 					
 					
-					float3 look = _WorldSpaceCameraPos - p[0].pos;	
+					//float3 look = _WorldSpaceCameraPos - p[0].pos;	
 					
-					float3 up =cross (look,UNITY_MATRIX_IT_MV[1].xyz);
+					float3 up =UNITY_MATRIX_IT_MV[1].xyz;
+					float3 right = UNITY_MATRIX_IT_MV[0].xyz;
 
 					//if(abs(look.y) > abs(look.x) || abs(look.y) > abs(look.z))
 					//	up = float3(1,0,0);
 
-					look.y = 0;
-					look = normalize(look);
+					//look.y = 0;
+					//look = normalize(look);
 					up = normalize(up);
-					float3 right = cross(up, look);
+					right = normalize(right);
+					//float3 right = cross(up, look);
 					
 					
 					//float size = (p[0].pos.z*_Size)/351.00146192  ;
-					float size = 0.01;
+					float size = 0.014;
 					float halfS = 0.5f * size;
 
 							
@@ -115,7 +117,7 @@ Shader "Custom/Simple Billboard"
 
 					//float4 vp = UnityObjectToClipPos(unity_WorldToObject);
 					FS_INPUT pIn;
-					pIn.pos = UnityObjectToClipPos( v[0]);
+					pIn.pos = UnityObjectToClipPos(v[0]);
 					pIn.tex0 = float2(1.0f, 0.0f);
 					pIn.color = p[0].color;
 					triStream.Append(pIn);

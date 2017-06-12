@@ -262,7 +262,7 @@ public class PointCloudSimple : MonoBehaviour
             MeshRenderer mr = a.AddComponent<MeshRenderer>();
             MeshFilter mf = a.AddComponent<MeshFilter>();
             mr.material = mat;
-            a.transform.parent = this.gameObject.transform;
+            a.transform.SetParent(this.gameObject.transform);
             a.transform.localPosition = Vector3.zero;
             a.transform.localRotation = Quaternion.identity;
             a.transform.localScale = new Vector3(1, 1, 1);
@@ -273,7 +273,7 @@ public class PointCloudSimple : MonoBehaviour
             MeshRenderer mr = a.AddComponent<MeshRenderer>();
             MeshFilter mf = a.AddComponent<MeshFilter>();
             mr.material = other;
-            a.transform.parent = this.gameObject.transform;
+            a.transform.SetParent(this.gameObject.transform);
             a.transform.localPosition = Vector3.zero;
             a.transform.localRotation = Quaternion.identity;
             a.transform.localScale = new Vector3(1, 1, 1);
