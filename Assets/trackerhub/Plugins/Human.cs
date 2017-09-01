@@ -9,6 +9,8 @@ public class Human
     public GameObject gameObject;
     public DateTime timeOfDeath;
     public string seenBySensor;
+	public Vector3 rightKneeAvg;
+	public Vector3 leftKneeAvg;
     private HumanSkeleton skeleton;
     public HumanSkeleton Skeleton
     {
@@ -38,10 +40,30 @@ public class Human
     internal void updateSkeleton()
     {
         skeleton.updateSkeleton();
+		Vector3 leftKneeAcum = new Vector3 ();
+		Vector3 rightKneeAcum = new Vector3 ();
+        
+		foreach (SensorBody body in bodies) {
+            Sensor sensor = skeleton.tracker.Sensors[body.sensorID];
+            leftKneeAcum += sensor.pointSensorToScene(CommonUtils.pointKinectToUnity(body.skeleton.jointsPositions[Windows.Kinect.JointType.KneeLeft]));
+            rightKneeAcum += sensor.pointSensorToScene(CommonUtils.pointKinectToUnity(body.skeleton.jointsPositions[Windows.Kinect.JointType.KneeRight]));
+		}
+
+		leftKneeAvg = leftKneeAcum / (float) bodies.Count;
+		rightKneeAvg = rightKneeAcum / (float)bodies.Count;
     }
 
     internal string getPDU()
     {
-        return "Sensor" + MessageSeparators.SET + seenBySensor + MessageSeparators.L2 + Skeleton.getPDU();
-    }
+        string rightKneeStr = CommonUtils.convertVectorToStringRPC(rightKneeAvg);
+        string leftKneeStr = CommonUtils.convertVectorToStringRPC(leftKneeAvg);
+
+        /*string rightKneeStr2 = CommonUtils.convertVectorToStringRPC(bodies[0].skeleton.jointsPositions[Windows.Kinect.JointType.KneeRight]);
+        string leftKneeStr2 = CommonUtils.convertVectorToStringRPC(bodies[0].skeleton.jointsPositions[Windows.Kinect.JointType.KneeLeft]);
+        */
+        Debug.Log("RIGHTKNEE=" + rightKneeStr + "   AVG=");
+
+        string specialKneesStr = "leftKneeAvg" + MessageSeparators.SET + leftKneeStr + MessageSeparators.L2 + "rightKneeAvg" + MessageSeparators.SET + rightKneeStr + MessageSeparators.L2;
+        return "Sensor" + MessageSeparators.SET + seenBySensor + MessageSeparators.L2 + Skeleton.getPDU() + MessageSeparators.L2 + specialKneesStr;
+	}
 }

@@ -531,6 +531,27 @@ public class Tracker : MonoBehaviour
 		return _sensors [bestBody.sensorID].pointSensorToScene (CommonUtils.pointKinectToUnity (bestBody.skeleton.jointsPositions [joint]));
 	}
 
+    public Vector3 getHumanJointAverage(int id, JointType joint)
+    {
+        Vector3 jointPos = new Vector3();
+        Vector3 accum = new Vector3();
+        Human h = _humans[id];
+        foreach (SensorBody b in h.bodies)
+        {
+            accum += _sensors[b.sensorID].pointSensorToScene(CommonUtils.pointKinectToUnity(b.skeleton.jointsPositions[joint]));
+        }
+        jointPos = accum / (float) h.bodies.Count;
+
+        return jointPos;
+    }
+
+
+    public Vector3 getJointPosition(int id,JointType joint)
+    {
+        Vector3 jointPos = getJointPosition(id, joint, Vector3.zero);
+        return jointPos;
+    }
+
 	internal bool humanHasBodies (int id)
 	{
 		return _humans.ContainsKey (id) && _humans [id].bodies.Count > 0;
