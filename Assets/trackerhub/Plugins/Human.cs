@@ -61,7 +61,7 @@ public class Human
         /*string rightKneeStr2 = CommonUtils.convertVectorToStringRPC(bodies[0].skeleton.jointsPositions[Windows.Kinect.JointType.KneeRight]);
         string leftKneeStr2 = CommonUtils.convertVectorToStringRPC(bodies[0].skeleton.jointsPositions[Windows.Kinect.JointType.KneeLeft]);
         */
-        Debug.Log("RIGHTKNEE=" + rightKneeStr + "   AVG=");
+        //Debug.Log("RIGHTKNEE=" + rightKneeStr + "   AVG=");
 
         string specialKneesStr = "leftKneeAvg" + MessageSeparators.SET + leftKneeStr + MessageSeparators.L2 + "rightKneeAvg" + MessageSeparators.SET + rightKneeStr + MessageSeparators.L2;
         return "Sensor" + MessageSeparators.SET + seenBySensor + MessageSeparators.L2 + Skeleton.getPDU() + MessageSeparators.L2 + specialKneesStr;
